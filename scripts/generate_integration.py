@@ -15,8 +15,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CTRL = ROOT / 'src/DareCare.Api/Controllers'
 OUT = ROOT / 'integration'
-CONTRACTS = list((ROOT / 'src/DareCare.Application/Contracts').glob('*.cs')) + [ROOT / 'src/DareCare.Api/Contracts/UploadPrescriptionRequest.cs']
-ENUMS = list((ROOT / 'src/DareCare.Domain').glob('*.cs'))
+CONTRACTS = sorted((ROOT / 'src/DareCare.Application/Contracts').glob('*.cs')) + [ROOT / 'src/DareCare.Api/Contracts/UploadPrescriptionRequest.cs']
+ENUMS = sorted((ROOT / 'src/DareCare.Domain').glob('*.cs'))
 VERBS = {'HttpGet':'get','HttpPost':'post','HttpPut':'put','HttpPatch':'patch','HttpDelete':'delete'}
 HTTP_ATTR = re.compile(r'\[(HttpGet|HttpPost|HttpPut|HttpPatch|HttpDelete)(?:\("([^"]*)"\))?\]')
 METHOD_RE = re.compile(r'public\s+(?:async\s+)?(?:Task<IActionResult>|IActionResult)\s+(\w+)\s*\(', re.S)
@@ -356,7 +356,12 @@ def main():
         desired=json.dumps(obj,indent=2,ensure_ascii=False)+'\n'
         target=OUT/fname
         if args.check:
-            if not target.exists() or target.read_text(encoding='utf-8')!=desired:mismatches.append(fname)
+            try:
+                actual = json.loads(target.read_text(encoding='utf-8'))
+            except (OSError, json.JSONDecodeError):
+                mismatches.append(fname)
+            else:
+                if actual != obj:mismatches.append(fname)
         else:target.write_text(desired,encoding='utf-8')
     print(f'Parsed {len(entries)} controller endpoints, {len(dtos)} DTOs, {len(enums)} enums; ' + ('check' if args.check else 'files generated'))
     if mismatches:
