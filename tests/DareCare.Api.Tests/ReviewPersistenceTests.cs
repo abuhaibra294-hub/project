@@ -70,6 +70,9 @@ public sealed class ReviewPersistenceTests
 
         db.NurseReviews.Add(NurseReview.Create(booking.Id, patientUser.Id, nurse.Id, 5, "Great"));
         db.SaveChanges();
+        // Clear the tracked one-to-one navigation to test the database unique index
+        // rather than EF Core's in-memory required relationship fixup.
+        db.ChangeTracker.Clear();
         db.NurseReviews.Add(NurseReview.Create(booking.Id, patientUser.Id, nurse.Id, 1, null));
         Assert.Throws<DbUpdateException>(() => db.SaveChanges());
     }
