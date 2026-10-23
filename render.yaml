@@ -1,65 +1,38 @@
-# DareCare staging on Render — paid web service + persistent disk + external SQL Server.
-# Use synthetic data only; do not upload real prescriptions or medical information.
-# Blueprint must be deployed from a dedicated DareCare GitHub repository.
+# DareCare FREE, DISPOSABLE demo (SYNTHETIC TEST DATA ONLY).
+# No external database, SMTP or payment is needed for the initial API smoke test.
+# Free Render has no persistent disk: accounts, bookings and uploaded test files
+# vanish on restart, scale-down, rebuild or redeploy. NEVER use real patient data.
 services:
   - type: web
-    name: darecare-api-staging
+    name: darecare-api-demo
     runtime: docker
-    plan: starter
+    plan: free
     region: frankfurt
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health/ready
-    autoDeployTrigger: checksPass
-    disk:
-      name: private-prescriptions
-      mountPath: /data
-      sizeGB: 5
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Staging
-      - key: PORT
-        value: "8080"
       - key: ASPNETCORE_HTTP_PORTS
+        value: "8080"
+      - key: PORT
         value: "8080"
       - key: ASPNETCORE_FORWARDEDHEADERS_ENABLED
         value: "true"
       - key: Database__Provider
-        value: SqlServer
-      - key: ConnectionStrings__DefaultConnection
-        sync: false
-      - key: Jwt__Key
-        generateValue: true
+        value: Sqlite
+      - key: Demo__AllowStagingSqlite
+        value: "true"
+      - key: Storage__PrivateDirectory
+        value: /tmp/darecare-demo/prescriptions
+      - key: Auth__RequireConfirmedEmail
+        value: "false"
+      - key: ApiDocs__EnableInStaging
+        value: "true"
       - key: Jwt__Issuer
         value: DareCare.Api
       - key: Jwt__Audience
         value: DareCare.Clients
-      - key: Jwt__ExpiryMinutes
-        value: "15"
-      - key: Auth__RefreshTokenDays
-        value: "14"
-      - key: Auth__RequireConfirmedEmail
-        value: "true"
-      - key: ApiDocs__EnableInStaging
-        value: "true"
-      - key: Storage__PrivateDirectory
-        value: /data/prescriptions
-      # Only HTTPS web frontend origins; mobile Flutter is not restricted by browser CORS.
-      - key: Cors__AllowedOrigins__0
-        sync: false
-      # SMTP is required for real email confirmation; no shared mock inbox on staging.
-      - key: Smtp__Host
-        sync: false
-      - key: Smtp__Port
-        value: "587"
-      - key: Smtp__FromEmail
-        sync: false
-      - key: Smtp__Username
-        sync: false
-      - key: Smtp__Password
-        sync: false
-      - key: Smtp__EnableSsl
-        value: "true"
-      # One-time admin bootstrap only during initial setup; never enable in Production.
-      - key: BootstrapAdmin__AllowOneTimeStaging
-        value: "false"
+      - key: Jwt__Key
+        generateValue: true

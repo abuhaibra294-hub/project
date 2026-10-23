@@ -1,9 +1,9 @@
 name: DareCare .NET CI and API Contract Drift
 on:
   push:
-    branches: [main]
+    branches: [main, darecare-demo-free]
   pull_request:
-    branches: [main]
+    branches: [main, darecare-demo-free]
 permissions:
   contents: read
 jobs:

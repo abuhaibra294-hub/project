@@ -13,20 +13,29 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// The one-click development lab uses an isolated SQLite database. Production requires SQL Server.
+// SQLite remains a local Development database by default. A disposable, synthetic-data-only
+// Render demo may explicitly opt in under Staging; Production must always use SQL Server.
 var databaseProvider = builder.Configuration["Database:Provider"] ?? "SqlServer";
-if (databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase) && !builder.Environment.IsDevelopment())
-    throw new InvalidOperationException("SQLite quick-start is Development-only; configure SQL Server for deployment.");
+var demoSqlite = builder.Environment.IsStaging() &&
+    builder.Configuration.GetValue<bool>("Demo:AllowStagingSqlite");
 var useSqlite = databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase);
+if (useSqlite && !builder.Environment.IsDevelopment() && !demoSqlite)
+    throw new InvalidOperationException("SQLite is allowed only in Development or opted-in Staging demo; Production requires SQL Server.");
 if (!useSqlite && !databaseProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
     throw new InvalidOperationException("Database:Provider must be SqlServer or Sqlite.");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (useSqlite)
 {
-    var dataDir = Path.Combine(builder.Environment.ContentRootPath, "App_Data");
+    // /tmp is writable by the non-root Docker user. Free Render loses all data on restart.
+    // If you later attach a paid persistent disk, set Demo:SqliteDirectory to /data.
+    var dataDir = demoSqlite
+        ? builder.Configuration["Demo:SqliteDirectory"] ?? Path.Combine(Path.GetTempPath(), "darecare-demo")
+        : Path.Combine(builder.Environment.ContentRootPath, "App_Data");
+    if (!Path.IsPathFullyQualified(dataDir))
+        throw new InvalidOperationException("Demo:SqliteDirectory must be an absolute path.");
     Directory.CreateDirectory(dataDir);
     connectionString = builder.Configuration.GetConnectionString("SqliteConnection")
-        ?? $"Data Source={Path.Combine(dataDir, "darecare-sprint5-dev.db")}";
+        ?? $"Data Source={Path.Combine(dataDir, demoSqlite ? "darecare-demo.db" : "darecare-sprint5-dev.db")}";
 }
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException("Set ConnectionStrings:DefaultConnection for SQL Server using user-secrets.");
@@ -209,7 +218,7 @@ app.MapGet("/health/ready", async (DareCareDbContext db, CancellationToken ct) =
         statusCode: StatusCodes.Status503ServiceUnavailable);
 });
 
-// SQLite development database is initialized on first launch. SQL Server uses explicit migrations.
+// SQLite is initialized for local Development or disposable Staging demos only. SQL Server uses explicit migrations.
 // EnsureCreated is intentionally NOT used for SQL Server, where schema evolution matters.
 using (var scope = app.Services.CreateScope())
 {
