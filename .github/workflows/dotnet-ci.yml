@@ -19,3 +19,30 @@ jobs:
       - run: dotnet restore DareCare.slnx
       - run: dotnet build DareCare.slnx --no-restore --configuration Release
       - run: dotnet test DareCare.slnx --no-build --configuration Release
+  render-free-container-smoke:
+    if: github.ref == 'refs/heads/darecare-demo-free'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build exact Docker image used by Render
+        run: docker build -t darecare-render-demo:ci .
+      - name: Boot container using Dockerfile defaults and verify readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --detach --name darecare-render-demo-ci \
+            -p 127.0.0.1:18080:8080 \
+            -e Jwt__Key="$(openssl rand -hex 48)" \
+            darecare-render-demo:ci
+          trap 'docker logs --tail 100 darecare-render-demo-ci; docker rm -f darecare-render-demo-ci >/dev/null 2>&1 || true' EXIT
+          for attempt in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:18080/health/ready > /tmp/darecare-ready.json; then
+              grep -q '"status":"ready"' /tmp/darecare-ready.json
+              curl --silent --fail http://127.0.0.1:18080/openapi/v1.json > /dev/null
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "DareCare did not become ready from Docker defaults." >&2
+          exit 1

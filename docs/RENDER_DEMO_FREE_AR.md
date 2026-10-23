@@ -13,6 +13,7 @@
 ## Environment variables
 | Key | Value |
 | --- | --- |
+| DOTNET_ENVIRONMENT | Staging |
 | ASPNETCORE_ENVIRONMENT | Staging |
 | ASPNETCORE_HTTP_PORTS | 8080 |
 | PORT | 8080 |
@@ -38,3 +39,10 @@ No CORS entry is needed until a real HTTPS browser frontend exists. Add only its
 Free Render has an **ephemeral filesystem**. The SQLite database, user accounts, bookings and fake uploads can disappear after a restart or redeployment. Do not rely on it for durable team integration. Use it only to prove the .NET API can build and start.
 
 The original SQL Server staging blueprint remains in `deployment/render-sqlserver-staging.yaml`. A reliable team staging environment needs a persistent external database or paid disk and proper mail configuration. Production rejects SQLite.
+
+## If Render shows Production + SQL Server in startup logs
+Ensure the latest GitHub commit is deployed. The demo Dockerfile now sets
+`DOTNET_ENVIRONMENT=Staging` and `Database__Provider=Sqlite` by default.
+In Render Environment, delete any contradictory `DOTNET_ENVIRONMENT=Production`
+or `Database__Provider=SqlServer` entry. Do not change secrets or switch to
+Development. Rebuild using **Manual Deploy > Deploy latest commit**.

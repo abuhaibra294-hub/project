@@ -12,6 +12,8 @@ services:
     dockerContext: .
     healthCheckPath: /health/ready
     envVars:
+      - key: DOTNET_ENVIRONMENT
+        value: Staging
       - key: ASPNETCORE_ENVIRONMENT
         value: Staging
       - key: ASPNETCORE_HTTP_PORTS
