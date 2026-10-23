@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DareCare API Explorer</title>
+<style>
+:root{color-scheme:dark;font:16px system-ui,sans-serif}body{max-width:1100px;margin:0 auto;padding:25px 16px;background:#111827;color:#f9fafb}h1{font-size:30px;margin-bottom:4px}p{color:#cbd5e1}
+input{font:inherit;background:#1f2937;color:#f9fafb;border:1px solid #475569;padding:12px;width:100%;box-sizing:border-box;border-radius:8px;margin:8px 0 16px}
+article{background:#1f2937;border:1px solid #334155;border-radius:10px;padding:12px 16px;margin:8px 0}
+code{font-size:14px;word-break:break-all}.method{display:inline-block;min-width:60px;font-weight:800;color:#93c5fd}.muted{color:#94a3b8;font-size:13px}a{color:#93c5fd}button{background:#374151;border:1px solid #475569;color:#f9fafb;border-radius:5px;cursor:pointer;padding:6px 9px;margin-left:10px}
+</style></head><body><h1>DareCare API Explorer</h1><p>Staging documentation — synthetic data only. No sign-in tokens are saved here. Import the <a href="/openapi/v1.json">runtime OpenAPI JSON</a> into Postman for requests.</p>
+<label for="filter">Search routes by HTTP method, path or summary</label><input id="filter" type="search" placeholder="e.g. bookings, pharmacy, auth" autocomplete="off">
+<p id="count" class="muted">Loading runtime API schema...</p><main id="routes" aria-live="polite"></main>
+<script>
+(async()=>{
+const list=document.getElementById('routes'), input=document.getElementById('filter'), count=document.getElementById('count');
+try {
+ const r=await fetch('/openapi/v1.json',{cache:'no-store'}); if(!r.ok)throw Error('HTTP '+r.status);
+ const schema=await r.json(), operations=[];
+ for(const [path,verbs] of Object.entries(schema.paths||{})) for(const [verb,data] of Object.entries(verbs))
+  if(['get','post','put','patch','delete'].includes(verb)) operations.push({verb:verb.toUpperCase(),path,summary:data.summary||data.operationId||'',security:!!data.security});
+ operations.sort((a,b)=>a.path.localeCompare(b.path)||a.verb.localeCompare(b.verb));
+ function draw(){let value=input.value.toLowerCase().trim(),filtered=operations.filter(o=>(o.verb+' '+o.path+' '+o.summary).toLowerCase().includes(value));
+  count.textContent=filtered.length+' / '+operations.length+' routes';list.replaceChildren();
+  for(const o of filtered){let card=document.createElement('article'),method=document.createElement('span'),path=document.createElement('code'),desc=document.createElement('div');
+   method.className='method';method.textContent=o.verb;path.textContent=o.path;desc.className='muted';desc.textContent=(o.security?'JWT required · ':'Public · ')+o.summary;
+   card.append(method,path,desc);list.append(card)} }
+ input.addEventListener('input',draw);draw();
+} catch(e){count.textContent='Could not load runtime OpenAPI: '+e.message;}
+})();
+</script></body></html>

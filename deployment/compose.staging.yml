@@ -1,0 +1,57 @@
+# Start only on a server you control, with DNS pointing to its public IP.
+# docker compose --env-file .env.staging -f deployment/compose.staging.yml up -d --build
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Staging
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      Database__Provider: SqlServer
+      ConnectionStrings__DefaultConnection: ${ConnectionStrings__DefaultConnection:?set_external_sqlserver_connection}
+      Jwt__Key: ${Jwt__Key:?generate_random_jwt_key}
+      Jwt__Issuer: DareCare.Api
+      Jwt__Audience: DareCare.Clients
+      Jwt__ExpiryMinutes: "15"
+      Auth__RequireConfirmedEmail: "true"
+      Cors__AllowedOrigins__0: ${FRONTEND_ORIGIN:?set_frontend_https_origin}
+      ApiDocs__EnableInStaging: "true"
+      Storage__PrivateDirectory: /data/prescriptions
+      Smtp__Host: ${Smtp__Host:?set_smtp_host}
+      Smtp__Port: ${Smtp__Port:-587}
+      Smtp__FromEmail: ${Smtp__FromEmail:?set_sender_email}
+      Smtp__Username: ${Smtp__Username:?set_smtp_username}
+      Smtp__Password: ${Smtp__Password:?set_smtp_password}
+      Smtp__EnableSsl: "true"
+      BootstrapAdmin__AllowOneTimeStaging: ${BootstrapAdmin__AllowOneTimeStaging:-false}
+      BootstrapAdmin__Email: ${BootstrapAdmin__Email:-}
+      BootstrapAdmin__Password: ${BootstrapAdmin__Password:-}
+    volumes:
+      - darecare_private_docs:/data/prescriptions
+    networks:
+      - inner
+  reverse_proxy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DARECARE_DOMAIN: ${DARECARE_DOMAIN:?set_dns_domain}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - inner
+    depends_on:
+      - api
+networks:
+  inner:
+volumes:
+  caddy_data:
+  caddy_config:
+  darecare_private_docs:

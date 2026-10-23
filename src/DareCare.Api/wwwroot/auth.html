@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DareCare | Authentication Lab (Development)</title>
+  <style>
+    :root { font-family: 'Segoe UI', Tahoma, system-ui, sans-serif; color: #102c3c; background: #f1f6f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; }
+    header { background: #103d4b; color: white; padding: 1rem max(1rem, calc((100% - 1060px)/2)); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { font-weight: 800; letter-spacing: .2px; font-size: 1.45rem; }
+    .brand span { color: #79d5cb; }
+    .tag { font-size: .78rem; background: #286774; border-radius: 100px; padding: .4rem .8rem; }
+    main { max-width: 1060px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: minmax(310px, 420px) 1fr; gap: 1.5rem; }
+    .card { background: white; border: 1px solid #d9e4e8; border-radius: 18px; box-shadow: 0 12px 36px #163d4510; padding: 1.4rem; }
+    h1 { font-size: 1.5rem; margin: .2rem 0 .6rem; }
+    h2 { font-size: 1.1rem; margin: 0 0 .8rem; }
+    p { color: #566d77; line-height: 1.7; font-size: .93rem; }
+    .tabs { display: flex; gap: .4rem; margin: 1rem 0 1.1rem; flex-wrap: wrap; }
+    button { cursor: pointer; font: inherit; border: none; border-radius: 10px; padding: .7rem 1rem; background: #086f72; color: white; transition: .12s ease; }
+    button:hover { filter: brightness(.94); }
+    button:focus-visible, input:focus-visible { outline: 3px solid #69cabc; outline-offset: 2px; }
+    button.secondary { background: #e8f1f2; color: #165260; }
+    button.danger { background: #9d3847; }
+    button.active { background: #103d4b; }
+    label { display: block; font-size: .88rem; font-weight: 600; margin: .8rem 0 .25rem; }
+    input { width: 100%; border: 1px solid #bbcdd4; font: inherit; border-radius: 9px; padding: .78rem .75rem; background: #fdfefe; direction: auto; }
+    input:disabled { background: #eaf0f2; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; }
+    .actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1rem; }
+    .hint { padding: .6rem .8rem; background: #edf9f7; border-right: 3px solid #32a99d; border-radius: 6px; font-size: .85rem; }
+    .space { height: 1px; background: #e2ecef; margin: 1.25rem 0; }
+    .log { background: #142f3b; color: #ccefe7; min-height: 270px; overflow: auto; line-height: 1.55; font-family: Consolas, monospace; font-size: .81rem; border-radius: 10px; white-space: pre-wrap; word-break: break-word; padding: 1rem; direction: ltr; text-align: left; }
+    .status { background: #eff4f7; padding: .65rem .8rem; border-radius: 9px; color: #345560; }
+    small { color: #617984; display: block; margin-top: .9rem; line-height: 1.7; }
+    details { border: 1px solid #d9e4e8; padding: 1rem; border-radius: 12px; margin-top: 1.25rem; }
+    summary { cursor: pointer; font-weight: 800; color: #165260; }
+    .workflow { margin-top: 1rem; }
+    .workflow > div { margin-top: .75rem; }
+    .workflow input { font-size: .9rem; }
+    .workflow button { font-size: .84rem; padding: .6rem .75rem; }
+    .workflow h3 { margin: 1.3rem 0 .4rem; font-size: .97rem; }
+    .hidden { display: none; }
+    @media (max-width: 850px) { main { grid-template-columns: 1fr; margin: 1rem auto; } header { padding: 1rem; } }
+  </style>
+</head>
+<body>
+  <header><div class="brand">Dare<span>Care</span> <span style="font-size:.85rem;color:white;font-weight:400">API Lab</span></div><span class="tag">Development only</span></header>
+  <main>
+    <section class="card">
+      <h1>تجربة الحسابات</h1>
+      <p>واجهة اختبار محلية متصلة بالـ REST API الحقيقي. لا تستخدم بيانات مرضى حقيقية أو كلمات مرور مهمة هنا.</p>
+      <div class="tabs" role="tablist" aria-label="اختيار العملية">
+        <button type="button" class="secondary active" data-tab="login">دخول</button>
+        <button type="button" class="secondary" data-tab="patient">عميل جديد</button>
+        <button type="button" class="secondary" data-tab="nurse">ممرض جديد</button>
+        <button type="button" class="secondary" data-tab="recovery">استعادة</button>
+      </div>
+      <form id="authForm">
+        <div class="new-only hidden"><label for="name">الاسم الكامل</label><input id="name" autocomplete="name" maxlength="160"></div>
+        <label for="email">البريد الإلكتروني</label><input type="email" id="email" autocomplete="username" placeholder="example@email.com" required maxlength="256">
+        <div id="passwordField"><label for="password">كلمة المرور</label><input type="password" id="password" autocomplete="current-password" required></div>
+        <div class="new-only hidden"><label for="phone">رقم الهاتف</label><input id="phone" type="tel" autocomplete="tel" maxlength="32"></div>
+        <div class="nurse-only hidden"><label for="license">رقم ترخيص الممرض</label><input id="license" maxlength="80"></div>
+        <div class="nurse-only hidden"><label for="experience">سنوات الخبرة</label><input id="experience" type="number" min="0" max="60" value="0"></div>
+        <div class="actions"><button type="submit" id="submitText">تسجيل الدخول</button></div>
+      </form>
+      <div id="recoveryBox" class="hidden">
+        <div class="space"></div><h2>الإيميل والأكواد</h2>
+        <p>تحتاج SMTP (مثل Mailpit) لإرسال كود إعادة كلمة السر أو تأكيد البريد.</p>
+        <label for="emailCode">الكود الوارد على الإيميل</label><input id="emailCode" autocomplete="one-time-code">
+        <label for="newPassword">كلمة السر الجديدة</label><input id="newPassword" type="password" autocomplete="new-password">
+        <div class="actions">
+          <button type="button" data-action="forgot">إرسال كود الاستعادة</button>
+          <button type="button" data-action="reset">تعيين كلمة السر</button>
+          <button type="button" class="secondary" data-action="resend">إعادة إرسال التأكيد</button>
+          <button type="button" class="secondary" data-action="verify">تأكيد البريد</button>
+        </div>
+      </div>
+      <small>الممرض يحتاج اعتماد الإدارة قبل ظهور خدماته. الصيدلية تُنشأ بدعوة من الإدارة فقط. الدخول مشترك لكل الأدوار.</small>
+    </section>
+    <section class="card">
+      <h2>لوحة اختبار الجلسة</h2>
+      <div class="status" id="status" role="status" aria-live="polite">لم يتم تسجيل الدخول</div>
+      <div class="actions">
+        <button type="button" data-action="me">بيانات الحساب</button>
+        <button type="button" data-action="dashboard">لوحتي حسب الدور</button>
+        <button type="button" data-action="profile">الملف الشخصي</button>
+        <button type="button" data-action="refresh">تجديد الجلسة</button>
+        <button type="button" class="secondary" data-action="logout">خروج</button>
+        <button type="button" class="danger" data-action="logoutall">خروج من كل الأجهزة</button>
+      </div>
+      <div class="space"></div>
+      <h2>تحديث الحساب / اختبار الإدارة</h2>
+      <div class="two">
+        <div><label for="fullNameEdit">الاسم الجديد</label><input id="fullNameEdit"></div>
+        <div><label for="phoneEdit">رقم الهاتف الجديد</label><input id="phoneEdit"></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="secondary" data-action="update">حفظ البيانات</button>
+        <button type="button" class="secondary" data-action="admin-nurses">ممرضون بانتظار الموافقة</button>
+        <button type="button" class="secondary" data-action="admin-pharmacies">صيدليات بانتظار الموافقة</button>
+      </div>
+      <details>
+        <summary>اختبار رحلة المشروع كاملة (ممرض - حجز - روشتة - صيدلية)</summary>
+        <div class="workflow">
+          <p>استخدم نفس جلسة الدخول أعلاه. بعض العمليات تتطلب تبديل الدور. القوائم تملأ المعرّفات تلقائيًا عند وجود نتائج.</p>
+          <h3>١. الخدمات والممرضون</h3>
+          <div class="two">
+            <div><label for="skillId">Skill ID</label><input id="skillId" placeholder="من زر المهارات"></div>
+            <div><label for="serviceId">Service ID</label><input id="serviceId" placeholder="من زر الخدمات"></div>
+            <div><label for="city">المدينة</label><input id="city" value="Mansoura"></div>
+            <div><label for="nurseId">Nurse ID</label><input id="nurseId" placeholder="من الترشيحات"></div>
+            <div><label for="slotId">Slot ID</label><input id="slotId" placeholder="من الترشيحات"></div>
+            <div><label for="startTime">موعد الممرض</label><input id="startTime" type="datetime-local"></div>
+            <div><label for="endTime">نهاية الموعد</label><input id="endTime" type="datetime-local"></div>
+          </div>
+          <div class="actions">
+            <button type="button" data-workflow="skills">المهارات</button>
+            <button type="button" data-workflow="services">الخدمات</button>
+            <button type="button" data-workflow="set-skills">تحديد مهارة الممرض</button>
+            <button type="button" data-workflow="set-nurse-profile">ملف الممرض</button>
+            <button type="button" data-workflow="add-slot">إضافة موعد</button>
+            <button type="button" data-workflow="matching">ترشيح ممرض مناسب</button>
+          </div>
+          <h3>٢. الإدارة والحجز</h3>
+          <div class="two">
+            <div><label for="approvalNurseId">معرف الممرض لاعتماده</label><input id="approvalNurseId"></div>
+            <div><label for="bookingId">Booking ID</label><input id="bookingId"></div>
+            <div><label for="address">عنوان تجريبي</label><input id="address" value="Demo Address - Mansoura"></div>
+          </div>
+          <div class="actions">
+            <button type="button" data-workflow="pending-nurses">طلبات الممرضين</button>
+            <button type="button" data-workflow="approve-nurse">اعتماد الممرض</button>
+            <button type="button" data-workflow="create-booking">حجز (عميل)</button>
+            <button type="button" data-workflow="my-bookings">حجوزاتي</button>
+            <button type="button" data-workflow="accept-booking">قبول (ممرض)</button>
+            <button type="button" data-workflow="start-booking">بدء (ممرض)</button>
+            <button type="button" data-workflow="complete-booking">إنهاء (ممرض)</button>
+          </div>
+          <h3>٣. تقييم الممرض بعد إنهاء الحجز</h3>
+          <div class="two">
+            <div><label for="reviewRating">عدد النجوم (١ إلى ٥)</label><input id="reviewRating" type="number" min="1" max="5" step="1" value="5"></div>
+            <div><label for="reviewComment">تعليق خاص اختياري</label><input id="reviewComment" maxlength="1000" placeholder="رأيك في الزيارة - لا تكتب بيانات صحية"></div>
+          </div>
+          <div class="actions">
+            <button type="button" data-workflow="submit-review">قيّم الزيارة (عميل)</button>
+            <button type="button" data-workflow="my-reviews">تقييماتي</button>
+            <button type="button" data-workflow="nurse-rating">متوسط تقييم الممرض</button>
+          </div>
+          <small>التقييم بعد اكتمال الزيارة فقط؛ تقييم واحد لكل حجز، والتعليق لا يظهر للعامة.</small>
+          <h3>٤. الصيدلية والروشتة</h3>
+          <div class="two">
+            <div><label for="pharmacyId">Pharmacy ID</label><input id="pharmacyId"></div>
+            <div><label for="prescriptionId">Prescription ID</label><input id="prescriptionId"></div>
+            <div><label for="orderId">Order ID</label><input id="orderId"></div>
+            <div><label for="quoteAmount">السعر المعروض بالجنيه (تجريبي)</label><input id="quoteAmount" type="number" step="0.01" min="0.01" value="180"></div>
+          </div>
+          <label for="rxFile">روشتة تجريبية بصيغة PDF / JPEG / PNG</label><input id="rxFile" type="file" accept=".pdf,.png,.jpg,.jpeg">
+          <div class="actions">
+            <button type="button" data-workflow="pharmacies">الصيدليات المعتمدة</button>
+            <button type="button" data-workflow="prescription-upload">رفع روشتة (عميل)</button>
+            <button type="button" data-workflow="prescription-inbox">روشتات الصيدلية</button>
+            <button type="button" data-workflow="quote">عرض السعر (صيدلية)</button>
+            <button type="button" data-workflow="orders">طلباتي/طلبات الصيدلية</button>
+            <button type="button" data-workflow="confirm">موافقة العميل</button>
+            <button type="button" data-workflow="prepare">تجهيز</button>
+            <button type="button" data-workflow="dispatch">توصيل</button>
+            <button type="button" data-workflow="deliver">تم التسليم</button>
+            <button type="button" data-workflow="notifications">الإشعارات</button>
+          </div>
+          <h3>٥. دعوة الصيدلية (الإدارة)</h3>
+          <div class="two">
+            <div><label for="pharmacyEmail">بريد الصيدلية التجريبي</label><input id="pharmacyEmail" type="email" value="pharmacy@darecare.test"></div>
+            <div><label for="pharmacyName">اسم الصيدلية</label><input id="pharmacyName" value="Demo Pharmacy"></div>
+            <div><label for="pharmacyLicense">رقم رخصة تجريبي</label><input id="pharmacyLicense" value="DEV-PHARM-001"></div>
+            <div><label for="pharmacyContact">اسم المسؤول</label><input id="pharmacyContact" value="Demo Pharmacist"></div>
+          </div>
+          <div class="actions">
+            <button type="button" data-workflow="create-pharmacy">دعوة صيدلية</button>
+            <button type="button" data-workflow="dev-mailbox">صندوق أكواد البريد التجريبي</button>
+            <button type="button" data-workflow="pending-pharmacies">صيدليات بانتظار الاعتماد</button>
+            <button type="button" data-workflow="approve-pharmacy">اعتماد الصيدلية</button>
+          </div>
+          <small>صندوق البريد يعرض أكوادًا تجريبية للإدارة من نفس الجهاز في Development فقط؛ استخدم كود الدعوة في تبويب الاستعادة لتعيين كلمة سر الصيدلية. لإجراء اختبار حقيقي استخدم بيانات وهمية فقط.</small>
+        </div>
+      </details>
+      <div class="space"></div>
+      <h2>استجابة الـAPI</h2>
+      <div id="output" class="log" aria-live="polite">ابدأ بإنشاء حساب عميل تجريبي أو تسجيل الدخول.</div>
+      <small>الـAccess Token والـRefresh Token محفوظان في الذاكرة فقط، ولا يتم عرضهما هنا أو في localStorage. عند تحديث الصفحة ستُنسى الجلسة.</small>
+    </section>
+  </main>
+  <script>
+  'use strict';
+  let tab = 'login';
+  let accessToken = '';
+  let refreshToken = '';
+  let currentRoles = [];
+  const $ = id => document.getElementById(id);
+  const value = id => $(id).value.trim();
+  const log = (title, obj) => { $('output').textContent = title + '\n' + JSON.stringify(obj, null, 2); };
+  const show = (selector, visible) => document.querySelectorAll(selector).forEach(node => node.classList.toggle('hidden', !visible));
+  function selectTab(next) {
+    tab = next;
+    document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === next));
+    show('.new-only', tab === 'patient' || tab === 'nurse');
+    show('.nurse-only', tab === 'nurse');
+    $('authForm').classList.toggle('hidden', tab === 'recovery');
+    $('recoveryBox').classList.toggle('hidden', tab !== 'recovery');
+    $('name').required = tab === 'patient' || tab === 'nurse';
+    $('phone').required = tab === 'patient' || tab === 'nurse';
+    $('license').required = tab === 'nurse';
+    $('submitText').textContent = tab === 'login' ? 'تسجيل الدخول' : 'إنشاء الحساب';
+  }
+  async function request(path, method = 'GET', data = null, authorized = true) {
+    const headers = { Accept: 'application/json' };
+    if (data !== null) headers['Content-Type'] = 'application/json';
+    if (authorized && accessToken) headers.Authorization = 'Bearer ' + accessToken;
+    const response = await fetch(path, { method, headers, body: data === null ? undefined : JSON.stringify(data), credentials: 'omit' });
+    const body = await response.text();
+    let json = null;
+    try { json = body ? JSON.parse(body) : null; } catch { json = body; }
+    if (!response.ok) throw { status: response.status, body: json };
+    return { status: response.status, body: json };
+  }
+  function retainSession(data) {
+    accessToken = data.accessToken || '';
+    refreshToken = data.refreshToken || '';
+    currentRoles = data.roles || [];
+    $('status').textContent = 'مسجل دخول | ' + currentRoles.join(', ') + ' | User ID: ' + (data.userId || '');
+  }
+  function clearSession() {
+    accessToken = '';
+    refreshToken = '';
+    currentRoles = [];
+    $('status').textContent = 'لم يتم تسجيل الدخول';
+  }
+  document.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => selectTab(button.dataset.tab)));
+  $('authForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = value('email');
+    const password = $('password').value;
+    const input = { email, password };
+    const path = tab === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register/' + tab;
+    if (tab !== 'login') Object.assign(input, { fullName: value('name'), phoneNumber: value('phone') });
+    if (tab === 'nurse') Object.assign(input, { licenseNumber: value('license'), yearsOfExperience: Number(value('experience')) });
+    try {
+      const res = await request(path, 'POST', input, false);
+      if (res.body?.accessToken) retainSession(res.body);
+      log(path + ' — HTTP ' + res.status, { ...res.body, accessToken: res.body?.accessToken ? '[REDACTED]' : undefined, refreshToken: res.body?.refreshToken ? '[REDACTED]' : undefined });
+    } catch (err) { log('Request failed', err); }
+  });
+  document.querySelectorAll('[data-action]').forEach(button => button.addEventListener('click', async () => {
+    const action = button.dataset.action;
+    try {
+      const base = '/api/v1/auth/';
+      let response;
+      if (action === 'me') response = await request(base + 'me');
+      else if (action === 'dashboard') response = await request('/api/v1/dashboard/me');
+      else if (action === 'profile') {
+        const path = currentRoles.includes('Patient') ? '/api/v1/patients/me'
+            : currentRoles.includes('Nurse') ? '/api/v1/nurses/me'
+            : currentRoles.includes('Pharmacy') ? '/api/v1/pharmacies/me' : '/api/v1/admin/users';
+        response = await request(path);
+      }
+      else if (action === 'refresh') {
+        response = await request(base + 'refresh', 'POST', { refreshToken }, false);
+        retainSession(response.body);
+      }
+      else if (action === 'logout') {
+        response = await request(base + 'logout', 'POST', { refreshToken });
+        clearSession();
+      }
+      else if (action === 'logoutall') {
+        response = await request(base + 'logout-all', 'POST');
+        clearSession();
+      }
+      else if (action === 'update') response = await request(base + 'me', 'PUT', { fullName: value('fullNameEdit'), phoneNumber: value('phoneEdit') });
+      else if (action === 'admin-nurses') response = await request('/api/v1/admin/nurses/pending');
+      else if (action === 'admin-pharmacies') response = await request('/api/v1/admin/pharmacies/pending');
+      else if (action === 'forgot') response = await request(base + 'forgot-password', 'POST', { email: value('email') }, false);
+      else if (action === 'resend') response = await request(base + 'resend-verification', 'POST', { email: value('email') }, false);
+      else if (action === 'reset') response = await request(base + 'reset-password', 'POST', { email: value('email'), code: value('emailCode'), newPassword: $('newPassword').value }, false);
+      else if (action === 'verify') response = await request(base + 'verify-email', 'POST', { email: value('email'), code: value('emailCode') }, false);
+      if (response) log(action + ' — HTTP ' + response.status, action === 'refresh' ? { ...response.body, accessToken: '[REDACTED]', refreshToken: '[REDACTED]' } : response.body);
+    } catch (err) { log('Request failed: ' + action, err); }
+  }));
+  // The workflow lab shares only in-memory auth state with the sign-in form above.
+  function setFirst(id, value) { if (value) $(id).value = value; }
+  function localInput(date) {
+    const p = n => String(n).padStart(2, '0');
+    return date.getFullYear() + '-' + p(date.getMonth() + 1) + '-' + p(date.getDate()) +
+      'T' + p(date.getHours()) + ':' + p(date.getMinutes());
+  }
+  $('startTime').value = localInput(new Date(Date.now() + 3 * 3600000));
+  $('endTime').value = localInput(new Date(Date.now() + 4 * 3600000));
+  async function uploadPrescription() {
+    const file = $('rxFile').files[0];
+    if (!file) throw { message: 'اختر روشتة تجريبية أولاً.' };
+    const data = new FormData();
+    data.append('file', file);
+    data.append('pharmacyProfileId', value('pharmacyId'));
+    if (value('bookingId')) data.append('bookingId', value('bookingId'));
+    const headers = { Accept: 'application/json' };
+    if (accessToken) headers.Authorization = 'Bearer ' + accessToken;
+    const response = await fetch('/api/v1/prescriptions', { method: 'POST', headers, body: data, credentials: 'omit' });
+    const body = await response.json();
+    if (!response.ok) throw { status: response.status, body };
+    return { status: response.status, body };
+  }
+  document.querySelectorAll('[data-workflow]').forEach(button => button.addEventListener('click', async () => {
+    const a = button.dataset.workflow;
+    const p = '/api/v1/';
+    try {
+      let r;
+      if (a === 'skills') {
+        r = await request(p + 'skills'); setFirst('skillId', r.body?.[0]?.id);
+      } else if (a === 'services') {
+        r = await request(p + 'services'); setFirst('serviceId', r.body?.[0]?.id);
+      } else if (a === 'set-skills') {
+        r = await request(p + 'nurses/me/skills', 'PUT', { skillIds: [value('skillId')] });
+      } else if (a === 'set-nurse-profile') {
+        r = await request(p + 'nurses/me', 'PUT', { city: value('city'), serviceArea: value('city'), bio: 'Demo profile', yearsOfExperience: 3, hourlyRate: 200 });
+      } else if (a === 'add-slot') {
+        r = await request(p + 'nurses/me/slots', 'POST', { startsAt: new Date($('startTime').value).toISOString(), endsAt: new Date($('endTime').value).toISOString() });
+      } else if (a === 'matching') {
+        const query = new URLSearchParams({ serviceId: value('serviceId'), city: value('city') });
+        r = await request(p + 'matching/nurses?' + query.toString());
+        setFirst('nurseId', r.body?.recommendations?.[0]?.id);
+        setFirst('slotId', r.body?.recommendations?.[0]?.slotId);
+      } else if (a === 'pending-nurses') {
+        r = await request(p + 'admin/nurses/pending'); setFirst('approvalNurseId', r.body?.[0]?.id);
+      } else if (a === 'approve-nurse') {
+        r = await request(p + 'admin/nurses/' + encodeURIComponent(value('approvalNurseId')) + '/approval', 'PATCH', { approved: true });
+      } else if (a === 'create-booking') {
+        r = await request(p + 'bookings', 'POST', { careServiceId: value('serviceId'), nurseProfileId: value('nurseId'), availabilitySlotId: value('slotId'), serviceAddress: value('address') });
+        setFirst('bookingId', r.body?.id);
+      } else if (a === 'my-bookings') {
+        r = await request(p + 'bookings/mine'); setFirst('bookingId', r.body?.[0]?.id);
+      } else if (['accept-booking','start-booking','complete-booking'].includes(a)) {
+        r = await request(p + 'bookings/' + encodeURIComponent(value('bookingId')) + '/' + a.split('-')[0].replace('complete','complete'), 'POST');
+      } else if (a === 'submit-review') {
+        r = await request(p + 'reviews/bookings/' + encodeURIComponent(value('bookingId')), 'POST', {
+          rating: Number(value('reviewRating')), comment: value('reviewComment') || null
+        });
+      } else if (a === 'my-reviews') {
+        r = await request(p + 'reviews/mine');
+      } else if (a === 'nurse-rating') {
+        r = await request(p + 'reviews/nurses/' + encodeURIComponent(value('nurseId')) + '/summary');
+      } else if (a === 'pharmacies') {
+        r = await request(p + 'pharmacies/available'); setFirst('pharmacyId', r.body?.[0]?.id);
+      } else if (a === 'prescription-upload') {
+        r = await uploadPrescription(); setFirst('prescriptionId', r.body?.id);
+      } else if (a === 'prescription-inbox') {
+        r = await request(p + 'prescriptions/inbox'); setFirst('prescriptionId', r.body?.[0]?.id);
+      } else if (a === 'quote') {
+        r = await request(p + 'orders/prescriptions/' + encodeURIComponent(value('prescriptionId')) + '/quote', 'POST', { amount: Number(value('quoteAmount')), notes: 'Reviewed by demo pharmacist' });
+        setFirst('orderId', r.body?.id);
+      } else if (a === 'orders') {
+        r = await request(p + (currentRoles.includes('Pharmacy') ? 'orders/inbox' : 'orders/mine')); setFirst('orderId', r.body?.[0]?.id);
+      } else if (['confirm','prepare','dispatch','deliver'].includes(a)) {
+        r = await request(p + 'orders/' + encodeURIComponent(value('orderId')) + '/' + a, 'POST');
+      } else if (a === 'notifications') {
+        r = await request(p + 'notifications');
+      } else if (a === 'create-pharmacy') {
+        r = await request(p + 'admin/pharmacies', 'POST', {
+          email: value('pharmacyEmail'), contactName: value('pharmacyContact'), phoneNumber: '+201000000000',
+          businessName: value('pharmacyName'), licenseNumber: value('pharmacyLicense'),
+          city: value('city'), address: value('address') });
+        setFirst('pharmacyId', r.body?.id);
+      } else if (a === 'dev-mailbox') {
+        r = await request(p + 'dev/mailbox');
+      } else if (a === 'pending-pharmacies') {
+        r = await request(p + 'admin/pharmacies/pending'); setFirst('pharmacyId', r.body?.[0]?.id);
+      } else if (a === 'approve-pharmacy') {
+        r = await request(p + 'admin/pharmacies/' + encodeURIComponent(value('pharmacyId')) + '/approval', 'PATCH', { approved: true });
+      }
+      if (r) log(a + ' — HTTP ' + r.status, r.body);
+    } catch (err) { log('Workflow error: ' + a, err); }
+  }));
+  selectTab('login');
+  </script>
+</body>
+</html>

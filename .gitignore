@@ -1,0 +1,32 @@
+**/bin/
+**/obj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.sln.docstates
+TestResults/
+coverage/
+.env
+.env.*
+!.env.example
+!.env.staging.example
+**/appsettings.Production.json
+**/appsettings.Local.json
+**/secrets.json
+*.pfx
+*.pem
+*.key
+
+# Never commit local databases, private patient documents, or dev credentials
+App_Data/
+**/App_Data/
+.localdata/
+*.db
+*.db-shm
+*.db-wal
+# Private staging config and captured LIVE schema can contain internal endpoints
+.env.staging
+**/.env.staging
+integration/*LIVE*.json

@@ -1,0 +1,380 @@
+@baseUrl = http://localhost:5208
+@patientToken = PASTE_PATIENT_JWT_HERE
+@patientRefresh = PASTE_PATIENT_REFRESH_TOKEN_HERE
+@nurseToken = PASTE_NURSE_JWT_HERE
+@adminToken = PASTE_ADMIN_JWT_HERE
+@pharmacyToken = PASTE_PHARMACY_JWT_HERE
+@prescriptionId = PASTE_PRESCRIPTION_GUID_HERE
+@orderId = PASTE_ORDER_GUID_HERE
+@nurseId = PASTE_NURSE_PROFILE_GUID_HERE
+@slotId = PASTE_SLOT_GUID_HERE
+@serviceId = PASTE_SERVICE_GUID_HERE
+@bookingId = PASTE_BOOKING_GUID_HERE
+
+### Health check
+GET {{baseUrl}}/health
+
+### Register patient
+POST {{baseUrl}}/api/v1/auth/register/patient
+Content-Type: application/json
+
+{
+  "fullName": "Demo Patient",
+  "email": "patient@example.test",
+  "password": "REPLACE_WITH_YOUR_DEV_PASSWORD",
+  "phoneNumber": "+201000000000"
+}
+
+### Register nurse (will require admin approval)
+POST {{baseUrl}}/api/v1/auth/register/nurse
+Content-Type: application/json
+
+{
+  "fullName": "Demo Nurse",
+  "email": "nurse@example.test",
+  "password": "REPLACE_WITH_YOUR_DEV_PASSWORD",
+  "phoneNumber": "+201011111111",
+  "licenseNumber": "DEMO-NURSE-LICENSE-01",
+  "yearsOfExperience": 4
+}
+
+### Login (copy accessToken as patientToken, nurseToken, or adminToken)
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "patient@example.test",
+  "password": "REPLACE_WITH_YOUR_DEV_PASSWORD"
+}
+
+### Refresh access session (replace old refresh token with NEW one every time)
+POST {{baseUrl}}/api/v1/auth/refresh
+Content-Type: application/json
+
+{ "refreshToken": "{{patientRefresh}}" }
+
+### Self account update
+PUT {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{ "fullName": "Demo Patient Updated", "phoneNumber": "+201000000000" }
+
+### Patient private profile
+GET {{baseUrl}}/api/v1/patients/me
+Authorization: Bearer {{patientToken}}
+
+### Update patient private profile
+PUT {{baseUrl}}/api/v1/patients/me
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{ "city": "Mansoura", "defaultAddress": "Demo Street 1", "emergencyContactName": "Demo Relative", "emergencyContactPhone": "+201010101010" }
+
+### Wrong-role access must return HTTP 403
+GET {{baseUrl}}/api/v1/nurses/me
+Authorization: Bearer {{patientToken}}
+
+### All-device logout immediately invalidates ALL access tokens (including this one)
+POST {{baseUrl}}/api/v1/auth/logout-all
+Authorization: Bearer {{patientToken}}
+
+### Signed-in account
+GET {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer {{patientToken}}
+
+### List skills, services, approved nurses
+GET {{baseUrl}}/api/v1/skills
+
+###
+GET {{baseUrl}}/api/v1/services
+
+###
+GET {{baseUrl}}/api/v1/nurses
+
+### Nurse selects skills (substitute a valid skillId from /skills)
+PUT {{baseUrl}}/api/v1/nurses/me/skills
+Content-Type: application/json
+Authorization: Bearer {{nurseToken}}
+
+{
+  "skillIds": ["f39d259c-e632-40c4-95a5-e986b0569273"]
+}
+
+### Nurse publishes an availability slot (REPLACE timestamps with future ISO 8601 values)
+POST {{baseUrl}}/api/v1/nurses/me/slots
+Content-Type: application/json
+Authorization: Bearer {{nurseToken}}
+
+{
+  "startsAt": "2026-11-10T12:00:00Z",
+  "endsAt": "2026-11-10T14:00:00Z"
+}
+
+### Admin sees nurses awaiting approval
+GET {{baseUrl}}/api/v1/admin/nurses/pending
+Authorization: Bearer {{adminToken}}
+
+### Admin approves nurse after MANUAL validation
+PATCH {{baseUrl}}/api/v1/admin/nurses/{{nurseId}}/approval
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "approved": true
+}
+
+### Check bookable slots for approved nurse
+GET {{baseUrl}}/api/v1/nurses/{{nurseId}}/slots
+
+### Patient books nurse+service+slot
+POST {{baseUrl}}/api/v1/bookings
+Content-Type: application/json
+Authorization: Bearer {{patientToken}}
+
+{
+  "nurseProfileId": "{{nurseId}}",
+  "availabilitySlotId": "{{slotId}}",
+  "careServiceId": "{{serviceId}}",
+  "serviceAddress": "Demo Address, Mansoura, Egypt"
+}
+
+### Nurse accepts booking
+POST {{baseUrl}}/api/v1/bookings/{{bookingId}}/accept
+Authorization: Bearer {{nurseToken}}
+
+### Nurse starts booking
+POST {{baseUrl}}/api/v1/bookings/{{bookingId}}/start
+Authorization: Bearer {{nurseToken}}
+
+### Nurse completes booking
+POST {{baseUrl}}/api/v1/bookings/{{bookingId}}/complete
+Authorization: Bearer {{nurseToken}}
+
+### Patient's own bookings
+GET {{baseUrl}}/api/v1/bookings/mine
+Authorization: Bearer {{patientToken}}
+
+### Admin audit
+GET {{baseUrl}}/api/v1/admin/audit
+Authorization: Bearer {{adminToken}}
+
+### Email confirmation (requires SMTP and an emailed code)
+POST {{baseUrl}}/api/v1/auth/verify-email
+Content-Type: application/json
+
+{ "email": "patient@example.test", "code": "PASTE_EMAIL_CODE" }
+
+### Forgot password - returns HTTP 202 even for unknown accounts
+POST {{baseUrl}}/api/v1/auth/forgot-password
+Content-Type: application/json
+
+{ "email": "patient@example.test" }
+
+### Reset password / accept an admin-invited Pharmacy staff account
+POST {{baseUrl}}/api/v1/auth/reset-password
+Content-Type: application/json
+
+{ "email": "patient@example.test", "code": "PASTE_RESET_CODE", "newPassword": "REPLACE_WITH_NEW_STRONG_PASSWORD" }
+
+### Admin invites a pharmacy account (must have SMTP configured)
+POST {{baseUrl}}/api/v1/admin/pharmacies
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "email": "pharmacy@example.test",
+  "contactName": "Demo Pharmacist",
+  "phoneNumber": "+201000000000",
+  "businessName": "Demo Pharmacy",
+  "licenseNumber": "DEMO-PHARMACY-LICENSE-01",
+  "city": "Mansoura",
+  "address": "Demo Pharmacy Location"
+}
+
+### Admin sees pending pharmacies
+GET {{baseUrl}}/api/v1/admin/pharmacies/pending
+Authorization: Bearer {{adminToken}}
+
+### Admin sees accounts and roles
+GET {{baseUrl}}/api/v1/admin/users
+Authorization: Bearer {{adminToken}}
+
+### Sprint 3: Public approved pharmacies
+GET {{baseUrl}}/api/v1/pharmacies/available
+
+### Nurse matching: replace with a real seeded service ID
+GET {{baseUrl}}/api/v1/matching/nurses?serviceId={{serviceId}}&city=Mansoura
+
+### Admin dashboard
+GET {{baseUrl}}/api/v1/admin/overview
+Authorization: Bearer {{adminToken}}
+
+### Patient prescription list
+GET {{baseUrl}}/api/v1/prescriptions/mine
+Authorization: Bearer {{patientToken}}
+
+### Pharmacy prescription inbox
+GET {{baseUrl}}/api/v1/prescriptions/inbox
+Authorization: Bearer {{pharmacyToken}}
+
+### Pharmacist quote
+POST {{baseUrl}}/api/v1/orders/prescriptions/{{prescriptionId}}/quote
+Authorization: Bearer {{pharmacyToken}}
+Content-Type: application/json
+
+{"amount":145.50,"notes":"Synthetic demo quote"}
+
+### Patient confirms quoted price
+POST {{baseUrl}}/api/v1/orders/{{orderId}}/confirm
+Authorization: Bearer {{patientToken}}
+
+### Notifications for logged in user
+GET {{baseUrl}}/api/v1/notifications
+Authorization: Bearer {{patientToken}}
+
+### Sprint 4: Get my role-scoped dashboard (works for all roles)
+GET {{baseUrl}}/api/v1/dashboard/me
+Authorization: Bearer {{patientToken}}
+
+### Sprint 4: Submit a verified visit review (once, after completion)
+POST {{baseUrl}}/api/v1/reviews/bookings/{{bookingId}}
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{ "rating": 5, "comment": "Synthetic private feedback" }
+
+### Sprint 4: Patient's private reviews
+GET {{baseUrl}}/api/v1/reviews/mine
+Authorization: Bearer {{patientToken}}
+
+### Sprint 4: Public nurse rating summary (without comments or patient names)
+GET {{baseUrl}}/api/v1/reviews/nurses/{{nurseId}}/summary
+
+### Sprint 4: Nurse dashboard
+GET {{baseUrl}}/api/v1/dashboard/me
+Authorization: Bearer {{nurseToken}}
+
+### Sprint 4: Pharmacy dashboard
+GET {{baseUrl}}/api/v1/dashboard/me
+Authorization: Bearer {{pharmacyToken}}
+
+### Sprint 4: Admin dashboard
+GET {{baseUrl}}/api/v1/dashboard/me
+Authorization: Bearer {{adminToken}}
+
+### ==================================
+### Sprint 5 - NEW API Examples
+### ==================================
+
+@addressId = REPLACE_WITH_SAVED_ADDRESS_GUID
+@ticketId = REPLACE_WITH_SUPPORT_TICKET_GUID
+
+### Save patient address
+POST {{baseUrl}}/api/v1/patients/me/addresses
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{ "label": "Home", "city": "Mansoura", "fullAddress": "Demo street 10, building 2", "isDefault": true }
+
+### List only my saved addresses
+GET {{baseUrl}}/api/v1/patients/me/addresses
+Authorization: Bearer {{patientToken}}
+
+### Select default address
+PUT {{baseUrl}}/api/v1/patients/me/addresses/{{addressId}}/default
+Authorization: Bearer {{patientToken}}
+
+### Create booking with a SAVED address (do not also send serviceAddress)
+POST {{baseUrl}}/api/v1/bookings
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{
+  "nurseProfileId": "{{nurseId}}",
+  "availabilitySlotId": "{{slotId}}",
+  "careServiceId": "{{serviceId}}",
+  "addressId": "{{addressId}}"
+}
+
+### Search active approved nurses
+GET {{baseUrl}}/api/v1/nurses/search?city=Mansoura&minYears=1&page=1&pageSize=10
+
+### Nurse public profile, no license details
+GET {{baseUrl}}/api/v1/nurses/{{nurseId}}
+
+### Search care services
+GET {{baseUrl}}/api/v1/services/search?query=care&pageSize=10
+
+### Save favorite nurse
+POST {{baseUrl}}/api/v1/favorites/nurses/{{nurseId}}
+Authorization: Bearer {{patientToken}}
+
+### List favorite nurses
+GET {{baseUrl}}/api/v1/favorites/nurses
+Authorization: Bearer {{patientToken}}
+
+### Remove favorite
+DELETE {{baseUrl}}/api/v1/favorites/nurses/{{nurseId}}
+Authorization: Bearer {{patientToken}}
+
+### Nurse's own schedule (includes isBooked)
+GET {{baseUrl}}/api/v1/nurses/me/slots
+Authorization: Bearer {{nurseToken}}
+
+### Filter my bookings
+GET {{baseUrl}}/api/v1/bookings/mine/search?status=Completed&page=1&pageSize=10
+Authorization: Bearer {{patientToken}}
+
+### Booking state timeline
+GET {{baseUrl}}/api/v1/bookings/{{bookingId}}/timeline
+Authorization: Bearer {{patientToken}}
+
+### Create private support request
+POST {{baseUrl}}/api/v1/support/tickets
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{
+  "subject": "Synthetic demo booking question",
+  "category": "Booking",
+  "message": "Please review this fictitious booking request for our class demo."
+}
+
+### My support requests
+GET {{baseUrl}}/api/v1/support/tickets/mine?page=1&pageSize=20
+Authorization: Bearer {{patientToken}}
+
+### Get private support ticket and paginated conversation
+GET {{baseUrl}}/api/v1/support/tickets/{{ticketId}}
+Authorization: Bearer {{patientToken}}
+
+### Reply to a support ticket
+POST {{baseUrl}}/api/v1/support/tickets/{{ticketId}}/messages
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{ "message": "This is another synthetic question for testing." }
+
+### Admin support inbox
+GET {{baseUrl}}/api/v1/support/admin/tickets?status=Open&page=1&pageSize=20
+Authorization: Bearer {{adminToken}}
+
+### Admin mark support ticket in progress
+PATCH {{baseUrl}}/api/v1/support/admin/tickets/{{ticketId}}/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "status": "InProgress" }
+
+### Unread notifications count
+GET {{baseUrl}}/api/v1/notifications/unread-count
+Authorization: Bearer {{patientToken}}
+
+### Mark all own notifications read
+PATCH {{baseUrl}}/api/v1/notifications/read-all
+Authorization: Bearer {{patientToken}}
+
+### Only unread notifications
+GET {{baseUrl}}/api/v1/notifications?unreadOnly=true
+Authorization: Bearer {{patientToken}}

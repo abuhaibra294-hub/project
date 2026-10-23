@@ -1,0 +1,4540 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "DareCare API v1 — source-derived team handoff",
+    "version": "1.0.0",
+    "description": "Generated from controllers, no live .NET execution. Runtime /openapi/v1.json is the authoritative generated schema."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5208",
+      "description": "Local demo only — change to actual HTTPS staging URL when deployed."
+    }
+  ],
+  "paths": {
+    "/api/v1/admin/audit": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: AuditLog",
+        "operationId": "Admin_AuditLog",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/nurses/pending": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: PendingNurses",
+        "operationId": "Admin_PendingNurses",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/nurses/{nurseId}/approval": {
+      "patch": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: SetApproval",
+        "operationId": "Admin_SetApproval",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "nurseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetApprovalRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/overview": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: Overview",
+        "operationId": "Admin_Overview",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/pharmacies": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: CreatePharmacy",
+        "operationId": "Admin_CreatePharmacy",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePharmacyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/pharmacies/pending": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: PendingPharmacies",
+        "operationId": "Admin_PendingPharmacies",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/pharmacies/{pharmacyId}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: GetPharmacy",
+        "operationId": "Admin_GetPharmacy",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "pharmacyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/pharmacies/{pharmacyId}/approval": {
+      "patch": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: SetPharmacyApproval",
+        "operationId": "Admin_SetPharmacyApproval",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "pharmacyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetApprovalRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/pharmacies/{pharmacyId}/resend-invite": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: ResendPharmacyInvite",
+        "operationId": "Admin_ResendPharmacyInvite",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "pharmacyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/users": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: ListUsers",
+        "operationId": "Admin_ListUsers",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/users/{userId}/status": {
+      "patch": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Admin: ChangeUserStatus",
+        "operationId": "Admin_ChangeUserStatus",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeUserStatusRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/change-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: ChangePassword",
+        "operationId": "Auth_ChangePassword",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: ForgotPassword",
+        "operationId": "Auth_ForgotPassword",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: Login",
+        "operationId": "Auth_Login",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: Logout",
+        "operationId": "Auth_Logout",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout-all": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: LogoutAll",
+        "operationId": "Auth_LogoutAll",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: Me",
+        "operationId": "Auth_Me",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: UpdateMe",
+        "operationId": "Auth_UpdateMe",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: Refresh",
+        "operationId": "Auth_Refresh",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register/nurse": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: RegisterNurse",
+        "operationId": "Auth_RegisterNurse",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterNurseRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register/patient": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: RegisterPatient",
+        "operationId": "Auth_RegisterPatient",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterPatientRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/resend-verification": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: ResendVerification",
+        "operationId": "Auth_ResendVerification",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: ResetPassword",
+        "operationId": "Auth_ResetPassword",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify-email": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: VerifyEmail",
+        "operationId": "Auth_VerifyEmail",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailTokenRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bookings": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Bookings: Create",
+        "operationId": "Bookings_Create",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/bookings/mine": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Bookings: Mine",
+        "operationId": "Bookings_Mine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse, Patient.",
+        "x-darecare-roles": [
+          "Nurse",
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/mine/search": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Bookings: SearchMine",
+        "operationId": "Bookings_SearchMine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse, Patient.",
+        "x-darecare-roles": [
+          "Nurse",
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/BookingStatus"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/{id}": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Bookings: Get",
+        "operationId": "Bookings_Get",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin, Nurse, Patient.",
+        "x-darecare-roles": [
+          "Admin",
+          "Nurse",
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/{id}/accept": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Bookings: Accept",
+        "operationId": "Bookings_Accept",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse.",
+        "x-darecare-roles": [
+          "Nurse"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Bookings: Cancel",
+        "operationId": "Bookings_Cancel",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/{id}/complete": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Bookings: Complete",
+        "operationId": "Bookings_Complete",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse.",
+        "x-darecare-roles": [
+          "Nurse"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/{id}/reject": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Bookings: Reject",
+        "operationId": "Bookings_Reject",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse.",
+        "x-darecare-roles": [
+          "Nurse"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/{id}/start": {
+      "post": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Bookings: Start",
+        "operationId": "Bookings_Start",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse.",
+        "x-darecare-roles": [
+          "Nurse"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/bookings/{id}/timeline": {
+      "get": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Bookings: Timeline",
+        "operationId": "Bookings_Timeline",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin, Nurse, Patient.",
+        "x-darecare-roles": [
+          "Admin",
+          "Nurse",
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/dashboard/me": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "summary": "Dashboard: Mine",
+        "operationId": "Dashboard_Mine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/dev/mailbox": {
+      "get": {
+        "tags": [
+          "DevelopmentMailbox"
+        ],
+        "summary": "DevelopmentMailbox: List",
+        "operationId": "DevelopmentMailbox_List",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/favorites/nurses": {
+      "get": {
+        "tags": [
+          "FavoriteNurses"
+        ],
+        "summary": "FavoriteNurses: All",
+        "operationId": "FavoriteNurses_All",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/favorites/nurses/{nurseId}": {
+      "delete": {
+        "tags": [
+          "FavoriteNurses"
+        ],
+        "summary": "FavoriteNurses: Remove",
+        "operationId": "FavoriteNurses_Remove",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "nurseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "FavoriteNurses"
+        ],
+        "summary": "FavoriteNurses: IsFavorite",
+        "operationId": "FavoriteNurses_IsFavorite",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "nurseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "FavoriteNurses"
+        ],
+        "summary": "FavoriteNurses: Add",
+        "operationId": "FavoriteNurses_Add",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "nurseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/matching/nurses": {
+      "get": {
+        "tags": [
+          "Matching"
+        ],
+        "summary": "Matching: Recommend",
+        "operationId": "Matching_Recommend",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "startsAt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        }
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Notifications: MyNotifications",
+        "operationId": "Notifications_MyNotifications",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [
+          {
+            "name": "unreadOnly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications/read-all": {
+      "patch": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Notifications: ReadAll",
+        "operationId": "Notifications_ReadAll",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications/unread-count": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Notifications: UnreadCount",
+        "operationId": "Notifications_UnreadCount",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}/read": {
+      "patch": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Notifications: MarkRead",
+        "operationId": "Notifications_MarkRead",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/nurses": {
+      "get": {
+        "tags": [
+          "Nurses"
+        ],
+        "summary": "Nurses: ListApproved",
+        "operationId": "Nurses_ListApproved",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        }
+      }
+    },
+    "/api/v1/nurses/me": {
+      "get": {
+        "tags": [
+          "Nurses"
+        ],
+        "summary": "Nurses: Me",
+        "operationId": "Nurses_Me",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse.",
+        "x-darecare-roles": [
+          "Nurse"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Nurses"
+        ],
+        "summary": "Nurses: UpdateMine",
+        "operationId": "Nurses_UpdateMine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse.",
+        "x-darecare-roles": [
+          "Nurse"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNurseProfileRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/nurses/me/skills": {
+      "put": {
+        "tags": [
+          "Nurses"
+        ],
+        "summary": "Nurses: SetSkills",
+        "operationId": "Nurses_SetSkills",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse.",
+        "x-darecare-roles": [
+          "Nurse"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetNurseSkillsRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/nurses/me/slots": {
+      "get": {
+        "tags": [
+          "Nurses"
+        ],
+        "summary": "Nurses: MySlots",
+        "operationId": "Nurses_MySlots",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse.",
+        "x-darecare-roles": [
+          "Nurse"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Nurses"
+        ],
+        "summary": "Nurses: AddSlot",
+        "operationId": "Nurses_AddSlot",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse.",
+        "x-darecare-roles": [
+          "Nurse"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAvailabilitySlotRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/nurses/me/slots/{slotId}": {
+      "delete": {
+        "tags": [
+          "Nurses"
+        ],
+        "summary": "Nurses: DeleteSlot",
+        "operationId": "Nurses_DeleteSlot",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Nurse.",
+        "x-darecare-roles": [
+          "Nurse"
+        ],
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/nurses/search": {
+      "get": {
+        "tags": [
+          "Nurses"
+        ],
+        "summary": "Nurses: Search",
+        "operationId": "Nurses_Search",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skillId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "minYears",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "maxHourlyRate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        }
+      }
+    },
+    "/api/v1/nurses/{nurseId}": {
+      "get": {
+        "tags": [
+          "Nurses"
+        ],
+        "summary": "Nurses: PublicProfile",
+        "operationId": "Nurses_PublicProfile",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [
+          {
+            "name": "nurseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        }
+      }
+    },
+    "/api/v1/nurses/{nurseId}/slots": {
+      "get": {
+        "tags": [
+          "Nurses"
+        ],
+        "summary": "Nurses: AvailableSlots",
+        "operationId": "Nurses_AvailableSlots",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [
+          {
+            "name": "nurseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        }
+      }
+    },
+    "/api/v1/orders/inbox": {
+      "get": {
+        "tags": [
+          "PharmacyOrders"
+        ],
+        "summary": "PharmacyOrders: Inbox",
+        "operationId": "PharmacyOrders_Inbox",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Pharmacy.",
+        "x-darecare-roles": [
+          "Pharmacy"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/orders/mine": {
+      "get": {
+        "tags": [
+          "PharmacyOrders"
+        ],
+        "summary": "PharmacyOrders: Mine",
+        "operationId": "PharmacyOrders_Mine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/orders/prescriptions/{prescriptionId}/quote": {
+      "post": {
+        "tags": [
+          "PharmacyOrders"
+        ],
+        "summary": "PharmacyOrders: Quote",
+        "operationId": "PharmacyOrders_Quote",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Pharmacy.",
+        "x-darecare-roles": [
+          "Pharmacy"
+        ],
+        "parameters": [
+          {
+            "name": "prescriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuotePrescriptionRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}": {
+      "get": {
+        "tags": [
+          "PharmacyOrders"
+        ],
+        "summary": "PharmacyOrders: Get",
+        "operationId": "PharmacyOrders_Get",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/orders/{id}/confirm": {
+      "post": {
+        "tags": [
+          "PharmacyOrders"
+        ],
+        "summary": "PharmacyOrders: Confirm",
+        "operationId": "PharmacyOrders_Confirm",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/orders/{id}/decline": {
+      "post": {
+        "tags": [
+          "PharmacyOrders"
+        ],
+        "summary": "PharmacyOrders: Decline",
+        "operationId": "PharmacyOrders_Decline",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/orders/{id}/deliver": {
+      "post": {
+        "tags": [
+          "PharmacyOrders"
+        ],
+        "summary": "PharmacyOrders: Deliver",
+        "operationId": "PharmacyOrders_Deliver",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Pharmacy.",
+        "x-darecare-roles": [
+          "Pharmacy"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/orders/{id}/dispatch": {
+      "post": {
+        "tags": [
+          "PharmacyOrders"
+        ],
+        "summary": "PharmacyOrders: Dispatch",
+        "operationId": "PharmacyOrders_Dispatch",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Pharmacy.",
+        "x-darecare-roles": [
+          "Pharmacy"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/orders/{id}/prepare": {
+      "post": {
+        "tags": [
+          "PharmacyOrders"
+        ],
+        "summary": "PharmacyOrders: Prepare",
+        "operationId": "PharmacyOrders_Prepare",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Pharmacy.",
+        "x-darecare-roles": [
+          "Pharmacy"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/patients/me": {
+      "get": {
+        "tags": [
+          "Patients"
+        ],
+        "summary": "Patients: GetMine",
+        "operationId": "Patients_GetMine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Patients"
+        ],
+        "summary": "Patients: UpdateMine",
+        "operationId": "Patients_UpdateMine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePatientProfileRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/patients/me/addresses": {
+      "get": {
+        "tags": [
+          "PatientAddresses"
+        ],
+        "summary": "PatientAddresses: All",
+        "operationId": "PatientAddresses_All",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "PatientAddresses"
+        ],
+        "summary": "PatientAddresses: Create",
+        "operationId": "PatientAddresses_Create",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavePatientAddressRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/patients/me/addresses/{addressId}": {
+      "delete": {
+        "tags": [
+          "PatientAddresses"
+        ],
+        "summary": "PatientAddresses: Delete",
+        "operationId": "PatientAddresses_Delete",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "addressId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "PatientAddresses"
+        ],
+        "summary": "PatientAddresses: One",
+        "operationId": "PatientAddresses_One",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "addressId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "PatientAddresses"
+        ],
+        "summary": "PatientAddresses: Update",
+        "operationId": "PatientAddresses_Update",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "addressId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavePatientAddressRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/patients/me/addresses/{addressId}/default": {
+      "put": {
+        "tags": [
+          "PatientAddresses"
+        ],
+        "summary": "PatientAddresses: SelectDefault",
+        "operationId": "PatientAddresses_SelectDefault",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "addressId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/pharmacies/available": {
+      "get": {
+        "tags": [
+          "Pharmacies"
+        ],
+        "summary": "Pharmacies: Available",
+        "operationId": "Pharmacies_Available",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Pharmacy.",
+        "x-darecare-roles": [
+          "Pharmacy"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/pharmacies/me": {
+      "get": {
+        "tags": [
+          "Pharmacies"
+        ],
+        "summary": "Pharmacies: GetMine",
+        "operationId": "Pharmacies_GetMine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Pharmacy.",
+        "x-darecare-roles": [
+          "Pharmacy"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Pharmacies"
+        ],
+        "summary": "Pharmacies: UpdateMine",
+        "operationId": "Pharmacies_UpdateMine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Pharmacy.",
+        "x-darecare-roles": [
+          "Pharmacy"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePharmacyRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prescriptions": {
+      "post": {
+        "tags": [
+          "Prescriptions"
+        ],
+        "summary": "Prescriptions: Upload",
+        "operationId": "Prescriptions_Upload",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadPrescriptionRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prescriptions/inbox": {
+      "get": {
+        "tags": [
+          "Prescriptions"
+        ],
+        "summary": "Prescriptions: PharmacyInbox",
+        "operationId": "Prescriptions_PharmacyInbox",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Pharmacy.",
+        "x-darecare-roles": [
+          "Pharmacy"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/prescriptions/mine": {
+      "get": {
+        "tags": [
+          "Prescriptions"
+        ],
+        "summary": "Prescriptions: Mine",
+        "operationId": "Prescriptions_Mine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/prescriptions/{id}": {
+      "get": {
+        "tags": [
+          "Prescriptions"
+        ],
+        "summary": "Prescriptions: Get",
+        "operationId": "Prescriptions_Get",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/prescriptions/{id}/file": {
+      "get": {
+        "tags": [
+          "Prescriptions"
+        ],
+        "summary": "Prescriptions: Download",
+        "operationId": "Prescriptions_Download",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/reviews/bookings/{bookingId}": {
+      "post": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "Reviews: Create",
+        "operationId": "Reviews_Create",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNurseReviewRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reviews/mine": {
+      "get": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "Reviews: GetMine",
+        "operationId": "Reviews_GetMine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/reviews/nurses/{nurseProfileId}/summary": {
+      "get": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "Reviews: NurseSummary",
+        "operationId": "Reviews_NurseSummary",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [
+          {
+            "name": "nurseProfileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        }
+      }
+    },
+    "/api/v1/reviews/{id}": {
+      "get": {
+        "tags": [
+          "Reviews"
+        ],
+        "summary": "Reviews: Get",
+        "operationId": "Reviews_Get",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/services": {
+      "get": {
+        "tags": [
+          "Services"
+        ],
+        "summary": "Services: Services",
+        "operationId": "Services_Services",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        }
+      }
+    },
+    "/api/v1/services/search": {
+      "get": {
+        "tags": [
+          "Services"
+        ],
+        "summary": "Services: SearchServices",
+        "operationId": "Services_SearchServices",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skillId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        }
+      }
+    },
+    "/api/v1/skills": {
+      "get": {
+        "tags": [
+          "Services"
+        ],
+        "summary": "Services: Skills",
+        "operationId": "Services_Skills",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        }
+      }
+    },
+    "/api/v1/support/admin/tickets": {
+      "get": {
+        "tags": [
+          "Support"
+        ],
+        "summary": "Support: AdminTickets",
+        "operationId": "Support_AdminTickets",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SupportTicketStatus"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SupportTicketCategory"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/support/admin/tickets/{id}/status": {
+      "patch": {
+        "tags": [
+          "Support"
+        ],
+        "summary": "Support: SetStatus",
+        "operationId": "Support_SetStatus",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Admin.",
+        "x-darecare-roles": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSupportStatusRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/support/tickets": {
+      "post": {
+        "tags": [
+          "Support"
+        ],
+        "summary": "Support: Create",
+        "operationId": "Support_Create",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSupportTicketRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/support/tickets/mine": {
+      "get": {
+        "tags": [
+          "Support"
+        ],
+        "summary": "Support: Mine",
+        "operationId": "Support_Mine",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SupportTicketStatus"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/support/tickets/{id}": {
+      "get": {
+        "tags": [
+          "Support"
+        ],
+        "summary": "Support: Get",
+        "operationId": "Support_Get",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "messagePage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "messagePageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/support/tickets/{id}/messages": {
+      "post": {
+        "tags": [
+          "Support"
+        ],
+        "summary": "Support: Reply",
+        "operationId": "Support_Reply",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplySupportTicketRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Liveness",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Kestrel is running."
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "summary": "Database readiness",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Connected to database."
+          },
+          "503": {
+            "description": "Database unavailable."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "BookingStatus": {
+        "type": "string",
+        "enum": [
+          "Pending",
+          "Accepted",
+          "InProgress",
+          "Completed",
+          "Cancelled",
+          "Rejected"
+        ]
+      },
+      "PharmacyOrderStatus": {
+        "type": "string",
+        "enum": [
+          "Quoted",
+          "Confirmed",
+          "Preparing",
+          "OutForDelivery",
+          "Delivered",
+          "Declined"
+        ]
+      },
+      "SupportTicketCategory": {
+        "type": "string",
+        "enum": [
+          "Account",
+          "Booking",
+          "Pharmacy",
+          "Other"
+        ]
+      },
+      "SupportTicketStatus": {
+        "type": "string",
+        "enum": [
+          "Open",
+          "InProgress",
+          "Resolved",
+          "Closed"
+        ]
+      },
+      "SavePatientAddressRequest": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "fullAddress": {
+            "type": "string",
+            "maxLength": 250
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 300,
+            "nullable": true
+          },
+          "isDefault": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "label",
+          "city",
+          "fullAddress"
+        ]
+      },
+      "CreateSupportTicketRequest": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "category": {
+            "$ref": "#/components/schemas/SupportTicketCategory"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "subject",
+          "message"
+        ]
+      },
+      "ReplySupportTicketRequest": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "UpdateSupportStatusRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/SupportTicketStatus",
+            "nullable": true
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "PatientAddressResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "fullAddress": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "city",
+          "fullAddress",
+          "isDefault",
+          "createdAtUtc"
+        ]
+      },
+      "CreateBookingRequest": {
+        "type": "object",
+        "properties": {
+          "nurseProfileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "availabilitySlotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "careServiceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "addressId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "serviceAddress": {
+            "type": "string",
+            "maxLength": 400,
+            "nullable": true
+          }
+        }
+      },
+      "SetApprovalRequest": {
+        "type": "object",
+        "properties": {
+          "approved": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "required": [
+          "approved"
+        ]
+      },
+      "BookingResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "patientUserId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nurseProfileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "availabilitySlotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceName": {
+            "type": "string"
+          },
+          "startsAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "serviceAddress": {
+            "type": "string"
+          },
+          "priceAtBooking": {
+            "type": "number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/BookingStatus"
+          }
+        },
+        "required": [
+          "id",
+          "patientUserId",
+          "nurseProfileId",
+          "availabilitySlotId",
+          "serviceName",
+          "startsAtUtc",
+          "endsAtUtc",
+          "serviceAddress",
+          "priceAtBooking",
+          "status"
+        ]
+      },
+      "UpdateAccountRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "phoneNumber": {
+            "type": "string",
+            "maxLength": 32
+          }
+        },
+        "required": [
+          "fullName",
+          "phoneNumber"
+        ]
+      },
+      "UpdatePatientProfileRequest": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string",
+            "maxLength": 120,
+            "nullable": true
+          },
+          "defaultAddress": {
+            "type": "string",
+            "maxLength": 400,
+            "nullable": true
+          },
+          "emergencyContactName": {
+            "type": "string",
+            "maxLength": 160,
+            "nullable": true
+          },
+          "emergencyContactPhone": {
+            "type": "string",
+            "maxLength": 32,
+            "nullable": true
+          }
+        }
+      },
+      "RefreshRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "EmailRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 256,
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "EmailTokenRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 256,
+            "format": "email"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 8192
+          }
+        },
+        "required": [
+          "email",
+          "code"
+        ]
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 256,
+            "format": "email"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 8192
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "code",
+          "newPassword"
+        ]
+      },
+      "CreatePharmacyRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 256,
+            "format": "email"
+          },
+          "contactName": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "phoneNumber": {
+            "type": "string",
+            "maxLength": 32
+          },
+          "businessName": {
+            "type": "string",
+            "maxLength": 180
+          },
+          "licenseNumber": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 400
+          }
+        },
+        "required": [
+          "email",
+          "contactName",
+          "phoneNumber",
+          "businessName",
+          "licenseNumber",
+          "city",
+          "address"
+        ]
+      },
+      "UpdatePharmacyRequest": {
+        "type": "object",
+        "properties": {
+          "businessName": {
+            "type": "string",
+            "maxLength": 180
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 400
+          }
+        },
+        "required": [
+          "businessName",
+          "city",
+          "address"
+        ]
+      },
+      "ChangeUserStatusRequest": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "required": [
+          "isActive"
+        ]
+      },
+      "CreateNurseReviewRequest": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "integer"
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 1000,
+            "nullable": true
+          }
+        }
+      },
+      "QuotePrescriptionRequest": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 1500,
+            "nullable": true
+          }
+        }
+      },
+      "UpdateNurseProfileRequest": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "maxLength": 1500,
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 120,
+            "nullable": true
+          },
+          "serviceArea": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "yearsOfExperience": {
+            "type": "integer"
+          },
+          "hourlyRate": {
+            "type": "number"
+          }
+        }
+      },
+      "SetNurseSkillsRequest": {
+        "type": "object",
+        "properties": {
+          "skillIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "skillIds"
+        ]
+      },
+      "CreateAvailabilitySlotRequest": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RegisterPatientRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 256,
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "maxLength": 32
+          }
+        },
+        "required": [
+          "fullName",
+          "email",
+          "password",
+          "phoneNumber"
+        ]
+      },
+      "RegisterNurseRequest": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 256,
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "maxLength": 32
+          },
+          "licenseNumber": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "yearsOfExperience": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "fullName",
+          "email",
+          "password",
+          "phoneNumber",
+          "licenseNumber"
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 256,
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accessToken": {
+            "type": "string"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "refreshTokenExpiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "userId",
+          "accessToken",
+          "expiresAtUtc",
+          "roles",
+          "refreshToken",
+          "refreshTokenExpiresAtUtc"
+        ]
+      },
+      "UploadPrescriptionRequest": {
+        "type": "object",
+        "properties": {
+          "pharmacyProfileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookingId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 1000,
+            "nullable": true
+          },
+          "file": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "pharmacyProfileId",
+          "file"
+        ]
+      }
+    }
+  }
+}

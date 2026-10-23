@@ -1,0 +1,21 @@
+name: DareCare .NET CI and API Contract Drift
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  build-test-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Source-derived API contract consistency
+        run: python3 scripts/generate_integration.py --check
+      - run: dotnet restore DareCare.slnx
+      - run: dotnet build DareCare.slnx --no-restore --configuration Release
+      - run: dotnet test DareCare.slnx --no-build --configuration Release

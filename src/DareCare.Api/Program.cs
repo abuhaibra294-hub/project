@@ -1,0 +1,233 @@
+using System.Text;
+using System.Security.Claims;
+using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+using DareCare.Api.Security;
+using DareCare.Api.Services;
+using DareCare.Infrastructure.Identity;
+using DareCare.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// The one-click development lab uses an isolated SQLite database. Production requires SQL Server.
+var databaseProvider = builder.Configuration["Database:Provider"] ?? "SqlServer";
+if (databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase) && !builder.Environment.IsDevelopment())
+    throw new InvalidOperationException("SQLite quick-start is Development-only; configure SQL Server for deployment.");
+var useSqlite = databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase);
+if (!useSqlite && !databaseProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Database:Provider must be SqlServer or Sqlite.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (useSqlite)
+{
+    var dataDir = Path.Combine(builder.Environment.ContentRootPath, "App_Data");
+    Directory.CreateDirectory(dataDir);
+    connectionString = builder.Configuration.GetConnectionString("SqliteConnection")
+        ?? $"Data Source={Path.Combine(dataDir, "darecare-sprint5-dev.db")}";
+}
+if (string.IsNullOrWhiteSpace(connectionString))
+    throw new InvalidOperationException("Set ConnectionStrings:DefaultConnection for SQL Server using user-secrets.");
+var secret = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(secret) || Encoding.UTF8.GetByteCount(secret) < 32)
+    throw new InvalidOperationException("Jwt:Key must be a secret of at least 32 UTF-8 bytes, supplied through user-secrets / environment.");
+if (builder.Configuration.GetValue<int>("Jwt:ExpiryMinutes", 15) is < 5 or > 60)
+    throw new InvalidOperationException("Jwt:ExpiryMinutes must be between 5 and 60.");
+if (builder.Configuration.GetValue<int>("Auth:RefreshTokenDays", 14) is < 1 or > 30)
+    throw new InvalidOperationException("Auth:RefreshTokenDays must be between 1 and 30.");
+// Explicit setting wins; by default production requires mailbox verification.
+builder.Configuration["Auth:RequireConfirmedEmail"] ??= builder.Environment.IsDevelopment() ? "false" : "true";
+var requireEmailConfirmation = builder.Configuration.GetValue<bool>("Auth:RequireConfirmedEmail");
+
+builder.Services.AddDbContext<DareCareDbContext>(options =>
+{
+    if (useSqlite) options.UseSqlite(connectionString);
+    else options.UseSqlServer(connectionString);
+});
+builder.Services.AddIdentityCore<ApplicationUser>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+        options.Password.RequiredLength = 12;
+        options.Password.RequireDigit = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.AllowedForNewUsers = true;
+    })
+    .AddRoles<IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<DareCareDbContext>()
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<JwtTokenService>();
+builder.Services.AddScoped<IPrivatePrescriptionStorage, PrivatePrescriptionStorage>();
+builder.Services.AddSingleton<DevelopmentEmailOutbox>();
+builder.Services.AddScoped<IAccountEmailService, AccountEmailService>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30),
+            NameClaimType = "sub",
+            RoleClaimType = "role"
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                if (!Guid.TryParse(context.Principal?.FindFirstValue("sub"), out var id) ||
+                    !int.TryParse(context.Principal?.FindFirstValue("token_version"), out var tokenVersion))
+                {
+                    context.Fail("Invalid account claim.");
+                    return;
+                }
+                var db = context.HttpContext.RequestServices.GetRequiredService<DareCareDbContext>();
+                var user = await db.Users.AsNoTracking().Where(u => u.Id == id)
+                    .Select(u => new { u.IsActive, u.IsPendingInvitation, u.EmailConfirmed, u.TokenVersion })
+                    .SingleOrDefaultAsync(context.HttpContext.RequestAborted);
+                if (user is null || !user.IsActive || user.IsPendingInvitation ||
+                    user.TokenVersion != tokenVersion ||
+                    (requireEmailConfirmation && !user.EmailConfirmed))
+                    context.Fail("Session expired or account disabled.");
+            }
+        };
+    });
+builder.Services.AddAuthorization();
+builder.Services.AddControllers().AddJsonOptions(options =>
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
+
+var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+// Explicit, exact browser origins only. Reject wildcard/invalid origins early instead of
+// making a deployed patient-data API accessible from untrusted websites.
+foreach (var origin in origins)
+{
+    if (!Uri.TryCreate(origin, UriKind.Absolute, out var parsed) ||
+        parsed.AbsolutePath != "/" || !string.IsNullOrEmpty(parsed.Query) ||
+        !string.IsNullOrEmpty(parsed.Fragment) ||
+        (parsed.Scheme != Uri.UriSchemeHttps &&
+         !(builder.Environment.IsDevelopment() && parsed.Scheme == Uri.UriSchemeHttp && parsed.IsLoopback)))
+        throw new InvalidOperationException("Cors:AllowedOrigins must contain exact HTTPS origins (HTTP localhost only for Development).");
+}
+builder.Services.AddCors(options => options.AddPolicy("clients", policy =>
+{
+    if (origins.Length > 0) policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod();
+}));
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    // Per-account throttling for user-generated support content.
+    options.AddPolicy("support-write", context => RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: context.User.FindFirstValue("sub") ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 6,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        }));
+    options.AddPolicy("auth", context => RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 10,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        }));
+});
+
+var app = builder.Build();
+// Production never exposes API metadata. Staging may opt in for integration testing.
+var enableDocs = app.Environment.IsDevelopment() ||
+    (app.Environment.IsStaging() && app.Configuration.GetValue<bool>("ApiDocs:EnableInStaging"));
+if (enableDocs)
+{
+    app.MapOpenApi();
+    // The explorer is deliberately mapped as a single file. This does NOT serve
+    // Development-only wwwroot/auth.html or the test mailbox on a public staging host.
+    app.MapGet("/docs", () => Results.File(
+        Path.Combine(app.Environment.ContentRootPath, "wwwroot", "api-docs.html"),
+        "text/html; charset=utf-8"));
+}
+if (app.Environment.IsDevelopment())
+{
+    // This manual API testing page is never exposed outside Development.
+    app.UseStaticFiles();
+    app.MapGet("/dev/auth", () => Results.Redirect("/auth.html"));
+}
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler(); // RFC 7807 generic errors, no exception detail in deployed responses.
+    app.UseHsts();
+}
+app.UseHttpsRedirection();
+// Responses containing account data or bearer tokens must never be cached.
+app.Use(async (ctx, next) =>
+{
+    if (ctx.Request.Path.StartsWithSegments("/api/v1"))
+    {
+        ctx.Response.Headers.CacheControl = "no-store";
+        ctx.Response.Headers.Pragma = "no-cache";
+    }
+    await next();
+});
+app.UseRouting();
+app.UseCors("clients");
+app.UseAuthentication();
+app.UseRateLimiter();
+app.UseAuthorization();
+app.MapControllers();
+// Liveness indicates that Kestrel is running; readiness verifies the real database.
+app.MapGet("/health", () => Results.Ok(new
+{
+    status = "healthy", service = "DareCare.Api", databaseProvider = useSqlite ? "Sqlite" : "SqlServer"
+}));
+app.MapGet("/health/ready", async (DareCareDbContext db, CancellationToken ct) =>
+{
+    try
+    {
+        if (await db.Database.CanConnectAsync(ct))
+            return Results.Ok(new { status = "ready", service = "DareCare.Api" });
+    }
+    catch (Exception) when (!ct.IsCancellationRequested) { /* Do not leak connection strings. */ }
+    return Results.Json(new { status = "unavailable", service = "DareCare.Api" },
+        statusCode: StatusCodes.Status503ServiceUnavailable);
+});
+
+// SQLite development database is initialized on first launch. SQL Server uses explicit migrations.
+// EnsureCreated is intentionally NOT used for SQL Server, where schema evolution matters.
+using (var scope = app.Services.CreateScope())
+{
+    if (useSqlite)
+    {
+        var db = scope.ServiceProvider.GetRequiredService<DareCareDbContext>();
+        await db.Database.EnsureCreatedAsync();
+    }
+    // A new Staging SQL database has no Admin; allow a ONE-TIME opt-in bootstrap.
+    // Remove AllowOneTimeStaging + credentials after the first successful initialization.
+    // Production always ignores this option to avoid accidental account creation.
+    var allowBootstrap = app.Environment.IsDevelopment() ||
+        (app.Environment.IsStaging() && builder.Configuration.GetValue<bool>("BootstrapAdmin:AllowOneTimeStaging"));
+    await InitialDataSeeder.SeedAsync(scope.ServiceProvider,
+        allowBootstrap ? builder.Configuration["BootstrapAdmin:Email"] : null,
+        allowBootstrap ? builder.Configuration["BootstrapAdmin:Password"] : null);
+}
+await app.RunAsync();
+
+// Expose Program for future WebApplicationFactory integration tests.
+public partial class Program { }

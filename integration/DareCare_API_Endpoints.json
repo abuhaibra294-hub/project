@@ -1,0 +1,664 @@
+{
+  "version": "v1",
+  "source": "ASP.NET C# controller route attributes",
+  "count": 93,
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/audit",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/nurses/pending",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/admin/nurses/{nurseId}/approval",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/overview",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/pharmacies",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/pharmacies/pending",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/pharmacies/{pharmacyId}",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/admin/pharmacies/{pharmacyId}/approval",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/pharmacies/{pharmacyId}/resend-invite",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/users",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/admin/users/{userId}/status",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/change-password",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/forgot-password",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout-all",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/auth/me",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/refresh",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/register/nurse",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/register/patient",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/resend-verification",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/reset-password",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/verify-email",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bookings",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/bookings/mine",
+      "roles": [
+        "Nurse",
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/bookings/mine/search",
+      "roles": [
+        "Nurse",
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/bookings/{id}",
+      "roles": [
+        "Admin",
+        "Nurse",
+        "Patient"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bookings/{id}/accept",
+      "roles": [
+        "Nurse"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bookings/{id}/cancel",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bookings/{id}/complete",
+      "roles": [
+        "Nurse"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bookings/{id}/reject",
+      "roles": [
+        "Nurse"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bookings/{id}/start",
+      "roles": [
+        "Nurse"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/bookings/{id}/timeline",
+      "roles": [
+        "Admin",
+        "Nurse",
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/me",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dev/mailbox",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/favorites/nurses",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/favorites/nurses/{nurseId}",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/favorites/nurses/{nurseId}",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/favorites/nurses/{nurseId}",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/matching/nurses",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/notifications",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/notifications/read-all",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/notifications/unread-count",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/notifications/{id}/read",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/nurses",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/nurses/me",
+      "roles": [
+        "Nurse"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/nurses/me",
+      "roles": [
+        "Nurse"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/nurses/me/skills",
+      "roles": [
+        "Nurse"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/nurses/me/slots",
+      "roles": [
+        "Nurse"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/nurses/me/slots",
+      "roles": [
+        "Nurse"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/nurses/me/slots/{slotId}",
+      "roles": [
+        "Nurse"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/nurses/search",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/nurses/{nurseId}",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/nurses/{nurseId}/slots",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders/inbox",
+      "roles": [
+        "Pharmacy"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders/mine",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/prescriptions/{prescriptionId}/quote",
+      "roles": [
+        "Pharmacy"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders/{id}",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/{id}/confirm",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/{id}/decline",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/{id}/deliver",
+      "roles": [
+        "Pharmacy"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/{id}/dispatch",
+      "roles": [
+        "Pharmacy"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders/{id}/prepare",
+      "roles": [
+        "Pharmacy"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/patients/me",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/patients/me",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/patients/me/addresses",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/patients/me/addresses",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/patients/me/addresses/{addressId}",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/patients/me/addresses/{addressId}",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/patients/me/addresses/{addressId}",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/patients/me/addresses/{addressId}/default",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pharmacies/available",
+      "roles": [
+        "Pharmacy"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pharmacies/me",
+      "roles": [
+        "Pharmacy"
+      ]
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/pharmacies/me",
+      "roles": [
+        "Pharmacy"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/prescriptions",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/prescriptions/inbox",
+      "roles": [
+        "Pharmacy"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/prescriptions/mine",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/prescriptions/{id}",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/prescriptions/{id}/file",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/reviews/bookings/{bookingId}",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/reviews/mine",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/reviews/nurses/{nurseProfileId}/summary",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/reviews/{id}",
+      "roles": [
+        "Patient"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/services",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/services/search",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/skills",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/support/admin/tickets",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/support/admin/tickets/{id}/status",
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/support/tickets",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/support/tickets/mine",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/support/tickets/{id}",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/support/tickets/{id}/messages",
+      "roles": [
+        "Authenticated"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="src/DareCare.Domain/DareCare.Domain.csproj" />
+  <Project Path="src/DareCare.Application/DareCare.Application.csproj" />
+  <Project Path="src/DareCare.Infrastructure/DareCare.Infrastructure.csproj" />
+  <Project Path="src/DareCare.Api/DareCare.Api.csproj" />
+  <Project Path="tests/DareCare.Domain.Tests/DareCare.Domain.Tests.csproj" />
+  <Project Path="tests/DareCare.Api.Tests/DareCare.Api.Tests.csproj" />
+</Solution>
