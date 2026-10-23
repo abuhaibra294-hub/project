@@ -15,15 +15,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 // SQLite remains a local Development database by default. A disposable, synthetic-data-only
 // Render demo may explicitly opt in under Staging; Production must always use SQL Server.
-var databaseProvider = builder.Configuration["Database:Provider"] ?? "SqlServer";
 var demoSqlite = builder.Environment.IsStaging() &&
     builder.Configuration.GetValue<bool>("Demo:AllowStagingSqlite");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var databaseProvider = builder.Configuration["Database:Provider"]?.Trim() ??
+    (demoSqlite ? "Sqlite" : "SqlServer");
+// This *disposable demo branch* is allowed to start without an external SQL Server.
+// If Render has stale SQL Server defaults but no connection string, respect the
+// explicit Staging demo opt-in and use temporary SQLite instead.
+if (demoSqlite && databaseProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase) &&
+    string.IsNullOrWhiteSpace(connectionString))
+{
+    Console.WriteLine("DareCare disposable Staging demo: no SQL Server connection configured; selecting temporary SQLite.");
+    databaseProvider = "Sqlite";
+}
+Console.WriteLine($"DareCare startup: environment={builder.Environment.EnvironmentName}, databaseProvider={databaseProvider}, disposableDemo={demoSqlite}");
 var useSqlite = databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase);
 if (useSqlite && !builder.Environment.IsDevelopment() && !demoSqlite)
     throw new InvalidOperationException("SQLite is allowed only in Development or opted-in Staging demo; Production requires SQL Server.");
 if (!useSqlite && !databaseProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
     throw new InvalidOperationException("Database:Provider must be SqlServer or Sqlite.");
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (useSqlite)
 {
     // /tmp is writable by the non-root Docker user. Free Render loses all data on restart.
