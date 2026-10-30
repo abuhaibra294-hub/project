@@ -23,6 +23,7 @@ jobs:
             echo "Migration already generated; nothing to do."
             exit 0
           fi
+          dotnet restore DareCare.slnx
           dotnet tool restore
           dotnet ef migrations add InitialSqlServer \
             --project src/DareCare.Infrastructure \
