@@ -109,3 +109,19 @@ The quick-start SQLite DB is now `darecare-sprint5-dev.db`; SQL Server LocalDB u
   private disk for prescription files, HTTPS, SMTP, and backups. Real databases
   and live deployment require separately provisioned infrastructure and secrets.
 - Read `docs/SPRINT8_SQLSERVER_AR.md` before migrating any existing database.
+
+
+## Sprint 9 - private uploads and deployed-version verification
+
+- Prescription uploads are streamed with an 8 MiB hard write cap. Invalid,
+  partial, overlong or exception-aborted streams are deleted, even when the
+  temporary file already matches the declared multipart length. Valid uploads
+  remain private under a server-generated storage key.
+- `Database:Provider=SqlServer` is **fail-closed** without a SQL Server
+  connection: it no longer falls back to disposable Staging SQLite.
+- `GET /health` includes the optional `deployedCommit` from Render's public
+  `RENDER_GIT_COMMIT` environment variable (no credentials or tokens).
+- Run `scripts/verify_render_release.py` with the **expected GitHub SHA**
+  to compare the live Render commit; read-only, no redeploy or account changes.
+- See `docs/SPRINT9_UPLOAD_RELEASE_SAFETY_AR.md`. The free Render service
+  currently uses **ephemeral SQLite**, unsuitable for real patient data.

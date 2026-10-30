@@ -70,24 +70,38 @@ public sealed class PrivatePrescriptionStorage(IWebHostEnvironment environment, 
         Directory.CreateDirectory(_directory);
         var key = $"{Guid.NewGuid():N}.bin"; // Server-controlled, never the untrusted upload name.
         var path = Path.Combine(_directory, key);
+        var completed = false;
         try
         {
-            await using var destination = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None,
-                81920, FileOptions.Asynchronous);
-            await destination.WriteAsync(header.AsMemory(0, n), ct);
-            await source.CopyToAsync(destination, ct);
-            // Never rely on IFormFile.Length alone when verifying actual file bytes.
-            if (destination.Length > MaxBytes || destination.Length != file.Length)
+            await using (var destination = new FileStream(path, FileMode.CreateNew, FileAccess.Write,
+                FileShare.None, 81920, FileOptions.Asynchronous))
             {
+                await destination.WriteAsync(header.AsMemory(0, n), ct);
+                long written = n;
+                var buffer = new byte[64 * 1024];
+                while (true)
+                {
+                    var read = await source.ReadAsync(buffer.AsMemory(), ct);
+                    if (read == 0) break;
+                    // Bound the physical disk writes, even when the declared
+                    // multipart length is inaccurate or the stream misbehaves.
+                    if (written + read > MaxBytes || written + read > file.Length)
+                        return null;
+                    await destination.WriteAsync(buffer.AsMemory(0, read), ct);
+                    written += read;
+                }
+                if (written != file.Length) return null;
                 await destination.FlushAsync(ct);
-                return null;
             }
+            // Only mark success after the stream closes without throwing.
+            completed = true;
             return key;
         }
         finally
         {
-            // Remove invalid/partial uploads. Valid files are only persisted with DB metadata.
-            if (File.Exists(path) && new FileInfo(path).Length != file.Length)
+            // In particular, an exception after writing *exactly* file.Length
+            // bytes must not leave an orphaned private document on disk.
+            if (!completed && File.Exists(path))
                 File.Delete(path);
         }
     }
