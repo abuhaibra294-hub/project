@@ -1,0 +1,130 @@
+name: DareCare SQL Server migration and HTTP integration
+on:
+  pull_request:
+    branches: [darecare-demo-free]
+  push:
+    branches: [darecare-demo-free]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sqlserver-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ASPNETCORE_ENVIRONMENT: Staging
+      DOTNET_ENVIRONMENT: Staging
+      Database__Provider: SqlServer
+      Demo__AllowStagingSqlite: "false"
+      Auth__RequireConfirmedEmail: "false"
+      ApiDocs__EnableInStaging: "true"
+      Jwt__Issuer: DareCare.Api
+      Jwt__Audience: DareCare.Clients
+      ASPNETCORE_URLS: http://127.0.0.1:18080
+      Storage__PrivateDirectory: /tmp/darecare-ci-prescriptions
+      DARECARE_SQLSERVER_STATE_PATH: /tmp/darecare-ci-persistence.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Launch isolated SQL Server 2022 Express (synthetic CI data only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          db_password="CiAa1!$(openssl rand -hex 20)"
+          jwt_key="$(openssl rand -hex 48)"
+          echo "::add-mask::$db_password"
+          echo "::add-mask::$jwt_key"
+          echo "Jwt__Key=$jwt_key" >> "$GITHUB_ENV"
+          echo "ConnectionStrings__DefaultConnection=Server=127.0.0.1,1433;Database=DareCareIntegrationCI;User Id=sa;Password=$db_password;Encrypt=True;TrustServerCertificate=True;Connect Timeout=5" >> "$GITHUB_ENV"
+          docker run --detach --name darecare-sqlserver-ci \
+            -p 127.0.0.1:1433:1433 \
+            -e ACCEPT_EULA=Y -e MSSQL_PID=Express -e MSSQL_SA_PASSWORD="$db_password" \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Restore and compile all projects
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet restore DareCare.slnx
+          dotnet tool restore
+          dotnet build DareCare.slnx --no-restore --configuration Release
+      - name: Verify migration snapshot and render reviewed idempotent SQL
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet ef migrations has-pending-model-changes \
+            --project src/DareCare.Infrastructure --startup-project src/DareCare.Api \
+            --configuration Release --no-build
+          dotnet ef migrations script --idempotent \
+            --project src/DareCare.Infrastructure --startup-project src/DareCare.Api \
+            --configuration Release --no-build --output "$RUNNER_TEMP/darecare-sqlserver-migrations.sql"
+          test -s "$RUNNER_TEMP/darecare-sqlserver-migrations.sql"
+      - name: Apply checked-in SQL Server migrations to fresh database
+        shell: bash
+        run: |
+          set -euo pipefail
+          migrated=0
+          for attempt in $(seq 1 20); do
+            if dotnet ef database update \
+              --project src/DareCare.Infrastructure --startup-project src/DareCare.Api \
+              --configuration Release --no-build > "$RUNNER_TEMP/migration-apply.log" 2>&1; then
+              migrated=1
+              break
+            fi
+            sleep 5
+          done
+          if [ "$migrated" -ne 1 ]; then
+            echo "Migration failed: see the latest SQL Server error lines."
+            grep -E 'Error Number:|error|Exception|failed' "$RUNNER_TEMP/migration-apply.log" | tail -n 12 || true
+            exit 1
+          fi
+          echo "SQL Server migration applied successfully."
+      - name: Test HTTP authentication, nurse concurrency and data across API restart
+        shell: bash
+        run: |
+          set -euo pipefail
+          api_pid=""
+          cleanup() {
+            if [ -n "$api_pid" ]; then
+              kill "$api_pid" 2>/dev/null || true
+              wait "$api_pid" 2>/dev/null || true
+            fi
+          }
+          trap cleanup EXIT
+          start_api() {
+            dotnet run --no-build --no-launch-profile --configuration Release \
+              --project src/DareCare.Api > "$RUNNER_TEMP/sqlserver-api.log" 2>&1 &
+            api_pid=$!
+            ready=0
+            for attempt in $(seq 1 45); do
+              if curl -fsS http://127.0.0.1:18080/health/ready > /dev/null 2>&1; then
+                ready=1
+                break
+              fi
+              if ! kill -0 "$api_pid" 2>/dev/null; then
+                break
+              fi
+              sleep 2
+            done
+            if [ "$ready" -ne 1 ]; then
+              echo "SQL Server staging API did not become ready."
+              tail -n 35 "$RUNNER_TEMP/sqlserver-api.log"
+              exit 1
+            fi
+          }
+          start_api
+          python3 scripts/ci_http_smoke.py
+          python3 scripts/ci_sqlserver_persistence.py seed
+          cleanup
+          api_pid=""
+          # Applying the same migrations twice must not destroy persisted rows.
+          dotnet ef database update \
+            --project src/DareCare.Infrastructure --startup-project src/DareCare.Api \
+            --configuration Release --no-build > "$RUNNER_TEMP/migration-repeat.log" 2>&1
+          start_api
+          python3 scripts/ci_sqlserver_persistence.py verify
+          echo "PASS SQL Server: migration, real HTTP, nurse slot concurrency and restart persistence."
+      - name: Cleanup isolated SQL Server
+        if: always()
+        run: docker rm -f darecare-sqlserver-ci >/dev/null 2>&1 || true
