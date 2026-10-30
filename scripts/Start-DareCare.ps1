@@ -80,6 +80,16 @@ try {
         } elseif ($existing -notmatch '(?m)^ConnectionStrings:DefaultConnection\s*=') {
             Run-Dotnet @('user-secrets','set','ConnectionStrings:DefaultConnection','Server=(localdb)\MSSQLLocalDB;Database=DareCareSprint8Db;Trusted_Connection=True;TrustServerCertificate=True','--project',$api)
         }
+        # EF Core design-time tooling deliberately reads an explicit environment
+        # connection string. Reuse the local secret without printing it to logs.
+        $connectionLine = (& dotnet user-secrets list --project $api) |
+            Where-Object { $_ -match '^ConnectionStrings:DefaultConnection\s*=' } |
+            Select-Object -First 1
+        if (-not $connectionLine) { throw 'Missing local SQL Server connection string.' }
+        $env:ConnectionStrings__DefaultConnection = ($connectionLine -split '\s*=\s*', 2)[1]
+        if ([string]::IsNullOrWhiteSpace($env:ConnectionStrings__DefaultConnection)) {
+            throw 'SQL Server connection string is empty.'
+        }
     } else {
         Info 'Zero-config SQLite demo mode selected. SQL Server is still available using START_SQLSERVER.cmd.'
         $env:Database__Provider = 'Sqlite'

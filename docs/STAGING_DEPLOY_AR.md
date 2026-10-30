@@ -18,15 +18,17 @@ try { $rng.GetBytes($bytes) } finally { $rng.Dispose() }
 
 ## إعداد قاعدة البيانات (مرة أولى على جهاز المطور)
 
-**لم نتمكن من توليد EF Core Migration دون SDK هنا.** افتح مشروع Sprint 6 بعد تركيب .NET 10 SDK وNuGet dependencies، ووصل بقاعدة SQL Server تجريبية منفصلة. يجب أن يكون `Jwt:Key` و`ConnectionStrings:DefaultConnection` مضبوطين باستخدام User Secrets أو environment variables، ثم:
+**تم توليد وحفظ EF Core Migration الخاصة بـSQL Server داخل المستودع في Sprint 8.** لا تولّد `InitialCreate` ثانية. يجب أن تكون القاعدة جديدة وفارغة، وأن تضبط `ConnectionStrings__DefaultConnection` في بيئة آمنة قبل تطبيق المخطط. شغّل:
 
 ```powershell
+dotnet restore DareCare.slnx
 dotnet tool restore
-dotnet ef migrations add InitialCreate --project src/DareCare.Infrastructure --startup-project src/DareCare.Api --output-dir Persistence/Migrations
+dotnet ef migrations script --idempotent --project src/DareCare.Infrastructure --startup-project src/DareCare.Api --output staging-migrations-review.sql
+# راجع ملف SQL قبل التطبيق، ثم:
 dotnet ef database update --project src/DareCare.Infrastructure --startup-project src/DareCare.Api
 ```
 
-إذا وجدت Migrations سابقة فلا تنشئ `InitialCreate` ثانية، بل أضف Migration جديدة للموديلات المعدلة. **لا تجرِ update على قاعدة مستخدمة قبل النسخ الاحتياطي ومراجعة السكربت**. ارفع ملفات Migrations إلى مستودع DareCare الخاص فقط. تجهيز قاعدة Staging الفعلية ممكن بالـEF CLI من بيئة مؤمنة ومتصلّة بقاعدة Staging باستخدام Connection String خاص بها، مع صلاحيات مخفضة بعد تطبيق المخطط.
+**لا تجرِ database update على قاعدة قديمة تحوي جداول موجودة بلا Migration History، أو على بيانات حقيقية دون نسخة احتياطية ومراجعة.** يُستخدم حساب ترحيل محدد الصلاحيات، ثم حساب تشغيل أقل صلاحيات. لم يتم إنشاء SQL Server خارجي على Render بهذا التعديل؛ انظر `docs/SPRINT8_SQLSERVER_AR.md`.
 
 ## تشغيل Docker + Caddy HTTPS
 
