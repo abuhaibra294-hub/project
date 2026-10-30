@@ -18,6 +18,8 @@ services:
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Staging
+      - key: DOTNET_ENVIRONMENT
+        value: Staging
       - key: PORT
         value: "8080"
       - key: ASPNETCORE_HTTP_PORTS
@@ -26,6 +28,8 @@ services:
         value: "true"
       - key: Database__Provider
         value: SqlServer
+      - key: Demo__AllowStagingSqlite
+        value: "false"
       - key: ConnectionStrings__DefaultConnection
         sync: false
       - key: Jwt__Key

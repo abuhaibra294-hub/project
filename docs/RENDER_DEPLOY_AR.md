@@ -6,7 +6,7 @@
 
 ## مهم قبل البدء
 
-- هذه Blueprint في `render.yaml` لخدمة **Render Web Service مدفوعة (starter) + Persistent Disk مدفوع**. لا تفترض أن النشر مجاني.
+- خدمة Render Free تستعمل `render.yaml` وSQLite مؤقتة؛ أما SQL Server الدائمة فتحتاج Blueprint منفصلة باسم `deployment/render-sqlserver-staging.yaml` وخدمة **Render Web Service مدفوعة (starter) + Persistent Disk مدفوع**. لا تفترض أن النشر مجاني.
 - قاعدة البيانات **SQL Server خارجية**: Render Postgres لا تعمل مع `UseSqlServer` بدون تعديل شامل للـProvider والـMigrations. لا تستخدم SQLite المعزول للتجربة كقاعدة عامة على الخدمة العامة.
 - تستعمل API منفذ `8080` و`/health/ready` للفحص؛ Render يولد تلقائيًا رابط HTTPS من نوع `https://<your-service>.onrender.com` بعد نجاح النشر.
 - الملفات المرفوعة تحفظ تحت `/data/prescriptions` بقرص دائم منفصل. يجب تجهيز نسخ احتياطية؛ وجود القرص لا يغني عن سياسة حماية بيانات.
@@ -15,9 +15,9 @@
 
 1. افتح المشروع محليًا بـ `START_DARECARE.cmd`. لازم `dotnet build` و`dotnet test` و`VERIFY_TEAM_API.cmd` تنجح **فعليًا**. لا تنشر مشروعًا لم يُختبر.
 2. أنشئ **مستودع GitHub جديدًا خاصًا** باسم `DareCare.Backend` (لا تستخدم مستودع `project` أو مستودعات تحفيظم)، وارفع محتويات مجلد `DareCare.Backend` فقط. لا ترفع `.localdata/`, `App_Data/`, `.env.staging`, أي توكنات أو كلمات مرور أو معلومات مرضى.
-3. جهّز SQL Server خارجيًا بدعم TLS، وصلاحيات DB مناسبة. من بيئة تطوير آمنة متصلة به أنشئ EF Migrations أو طبّق الموجودة (بعد مراجعة SQL والنسخ الاحتياطي). هذا ضروري **قبل** تشغيل الخدمة لأول مرة؛ السيرفر لا يهاجر SQL تلقائيًا.
+3. جهّز SQL Server خارجيًا بدعم TLS، وصلاحيات DB مناسبة. من بيئة تطوير آمنة متصلة به طبّق EF Core Migration المحفوظة (بعد مراجعة SQL والنسخ الاحتياطي). هذا ضروري **قبل** تشغيل الخدمة لأول مرة؛ السيرفر لا يهاجر SQL تلقائيًا.
 4. جهّز خدمة SMTP حقيقية لتأكيد البريد، وبريدًا تجريبيًا للإدارة. احرص أن الحسابات التجريبية لا تستخدم معلومات حقيقية.
-5. افتح https://dashboard.render.com/ → New → Blueprint، اختر مستودع DareCare الذي يحتوي على `render.yaml` في الجذر. النشر التلقائي مضبوط على `checksPass`، فلا تنشر التحديثات إلا بعد مرور GitHub CI بنجاح.
+5. افتح https://dashboard.render.com/ → New → Blueprint، واختر `deployment/render-sqlserver-staging.yaml` (أو انسخ محتواه إلى Blueprint في جذر مستودع مخصص). **لا تختَر `render.yaml` المجانية**؛ فهي تستخدم SQLite المؤقتة. راقب نجاح GitHub CI قبل النشر.
 6. أدخل الحقول السرية المطلوبة في إعدادات Render: `ConnectionStrings__DefaultConnection`, `Cors__AllowedOrigins__0`, حقول SMTP. لا تضعها في Git.
 7. لإنشاء أول مدير على Staging فقط، اضبط مؤقتًا في لوحة Render: `BootstrapAdmin__AllowOneTimeStaging=true` و`BootstrapAdmin__Email` و`BootstrapAdmin__Password` بقيم قوية. بعد أول نشر ناجح غيّر التفعيل إلى false **واحذف كلمات المرور من لوحة البيئة** ثم أعد النشر.
 8. افتح `https://<render-url>/health/ready` وتأكد من HTTP 200، ثم `https://<render-url>/docs` لعرض المسارات و`https://<render-url>/openapi/v1.json` لإصدار OpenAPI من التطبيق الحي.

@@ -73,12 +73,22 @@ try {
         & sqllocaldb start MSSQLLocalDB | Out-Host
         if ($LASTEXITCODE -ne 0) { throw 'Could not start SQL Server LocalDB.' }
         $existing = (& dotnet user-secrets list --project $api) -join "`n"
-        if ($existing -match '(?m)^ConnectionStrings:DefaultConnection\s*=.*DareCareSprint[234]Db') {
+        if ($existing -match '(?m)^ConnectionStrings:DefaultConnection\s*=.*DareCareSprint[2345]Db') {
             # Preserve the existing Sprint 3 database rather than running new schema migrations over it.
-            Info 'Switching the previous generated LocalDB connection to an isolated Sprint 5 demo database.'
-            Run-Dotnet @('user-secrets','set','ConnectionStrings:DefaultConnection','Server=(localdb)\MSSQLLocalDB;Database=DareCareSprint5Db;Trusted_Connection=True;TrustServerCertificate=True','--project',$api)
+            Info 'Switching the previous generated LocalDB connection to an isolated Sprint 8 migration-backed database.'
+            Run-Dotnet @('user-secrets','set','ConnectionStrings:DefaultConnection','Server=(localdb)\MSSQLLocalDB;Database=DareCareSprint8Db;Trusted_Connection=True;TrustServerCertificate=True','--project',$api)
         } elseif ($existing -notmatch '(?m)^ConnectionStrings:DefaultConnection\s*=') {
-            Run-Dotnet @('user-secrets','set','ConnectionStrings:DefaultConnection','Server=(localdb)\MSSQLLocalDB;Database=DareCareSprint5Db;Trusted_Connection=True;TrustServerCertificate=True','--project',$api)
+            Run-Dotnet @('user-secrets','set','ConnectionStrings:DefaultConnection','Server=(localdb)\MSSQLLocalDB;Database=DareCareSprint8Db;Trusted_Connection=True;TrustServerCertificate=True','--project',$api)
+        }
+        # EF Core design-time tooling deliberately reads an explicit environment
+        # connection string. Reuse the local secret without printing it to logs.
+        $connectionLine = (& dotnet user-secrets list --project $api) |
+            Where-Object { $_ -match '^ConnectionStrings:DefaultConnection\s*=' } |
+            Select-Object -First 1
+        if (-not $connectionLine) { throw 'Missing local SQL Server connection string.' }
+        $env:ConnectionStrings__DefaultConnection = ($connectionLine -split '\s*=\s*', 2)[1]
+        if ([string]::IsNullOrWhiteSpace($env:ConnectionStrings__DefaultConnection)) {
+            throw 'SQL Server connection string is empty.'
         }
     } else {
         Info 'Zero-config SQLite demo mode selected. SQL Server is still available using START_SQLSERVER.cmd.'
@@ -127,12 +137,11 @@ try {
         Info 'Preparing SQL Server schema with EF Core migrations...'
         Run-Dotnet @('tool','restore')
         $migrationDir = Join-Path $infra 'Persistence\Migrations'
-        if (-not (Test-Path $migrationDir) -or -not (Get-ChildItem $migrationDir -Filter '*_InitialCreate.cs' -ErrorAction SilentlyContinue)) {
-            Run-Dotnet @('ef','migrations','add','InitialCreate','--project',$infra,'--startup-project',$api,'--output-dir','Persistence/Migrations')
-        } elseif (-not (Get-ChildItem $migrationDir -Filter '*_AddSprint5Modules.cs' -ErrorAction SilentlyContinue)) {
-            # Preserve previous migration history and scaffold only the new schema delta.
-            Run-Dotnet @('ef','migrations','add','AddSprint5Modules','--project',$infra,'--startup-project',$api,'--output-dir','Persistence/Migrations')
+        if (-not (Get-ChildItem $migrationDir -Filter '*_InitialSqlServer.cs' -ErrorAction SilentlyContinue)) {
+            throw 'Checked-in SQL Server migration is missing; do not generate migrations automatically at startup.'
         }
+        # Use an isolated local DareCareSprint8Db for new demos.
+        # Back up older databases and review their migration history before updating.
         Run-Dotnet @('ef','database','update','--project',$infra,'--startup-project',$api)
     }
     if ($TestOnly) { Info 'Build and tests finished.'; exit 0 }
