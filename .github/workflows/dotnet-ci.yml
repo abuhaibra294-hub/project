@@ -20,7 +20,8 @@ jobs:
       - run: dotnet build DareCare.slnx --no-restore --configuration Release
       - run: dotnet test DareCare.slnx --no-build --configuration Release
   render-free-container-smoke:
-    if: github.ref == 'refs/heads/darecare-demo-free'
+    # Test the exact Render Docker image before merging into the demo branch too.
+    if: github.ref == 'refs/heads/darecare-demo-free' || (github.event_name == 'pull_request' && github.base_ref == 'darecare-demo-free')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -40,6 +41,7 @@ jobs:
             if curl --silent --fail http://127.0.0.1:18080/health/ready > /tmp/darecare-ready.json; then
               grep -q '"status":"ready"' /tmp/darecare-ready.json
               curl --silent --fail http://127.0.0.1:18080/openapi/v1.json > /dev/null
+              python3 scripts/ci_http_smoke.py
               exit 0
             fi
             sleep 2

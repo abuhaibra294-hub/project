@@ -86,3 +86,10 @@ The quick-start SQLite DB is now `darecare-sprint5-dev.db`; SQL Server LocalDB u
 - `render.yaml`, `docs/RENDER_DEPLOY_AR.md`: **not yet deployed**, paid Render staging blueprint with external SQL Server, SMTP, persistent disk and readiness checks.
 
 **Do not claim production readiness or a public URL until Windows .NET build/tests, EF migrations, HTTPS deploy and runtime smoke testing have passed.**
+
+## Sprint 7 — availability transaction safety and privacy regression tests
+
+- Creating a nurse availability slot now checks overlaps **inside a serializable transaction**, so simultaneous API requests cannot both commit overlapping windows. Known SQL Server/SQLite write collisions produce HTTP 409 (reload and retry); unexpected DB errors are not suppressed.
+- Added SQLite-backed controller and persistence tests for slot overlaps/adjacency, active-booking uniqueness, patient/pharmacy resource ownership, and notification isolation. No existing API routes or response shapes were changed.
+- CI builds/tests and starts the Docker demo, but Render Free uses **disposable SQLite data**. SQL Server multi-instance race testing and real HTTP integration testing remain release gates.
+- QA instructions: `docs/SPRINT7_BACKEND_STABILIZATION_AR.md`.

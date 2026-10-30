@@ -4,5 +4,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.13" />
+    <!-- Overrides the vulnerable 9.0.11 transitively restored by SQL client dependencies.
+         10.0.13 includes the Oct 2026 PKCS security fixes (CVE-2026-84008 and CVE-2026-70162). -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
   </ItemGroup>
 </Project>
