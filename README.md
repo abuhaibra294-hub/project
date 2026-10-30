@@ -93,3 +93,19 @@ The quick-start SQLite DB is now `darecare-sprint5-dev.db`; SQL Server LocalDB u
 - Added SQLite-backed controller and persistence tests for slot overlaps/adjacency, active-booking uniqueness, patient/pharmacy resource ownership, and notification isolation. No existing API routes or response shapes were changed.
 - CI builds/tests and starts the Docker demo, but Render Free uses **disposable SQLite data**. SQL Server multi-instance race testing and real HTTP integration testing remain release gates.
 - QA instructions: `docs/SPRINT7_BACKEND_STABILIZATION_AR.md`.
+
+
+## Sprint 8 - SQL Server durability and staging validation
+
+- The checked-in SQL Server EF Core InitialSqlServer migration (plus model snapshot)
+  is the authoritative schema for a **new, empty** SQL Server database.
+- SQL Server startup is fail-closed if migrations are pending; the API does **not**
+  migrate production or staging automatically. Do not run `EnsureCreated` for SQL Server.
+- A dedicated GitHub Actions test starts isolated SQL Server 2022 Express, applies
+  migrations, runs **real HTTP auth/privacy tests**, verifies nurse-slot write
+  contention, restarts the API, and checks that data survives.
+- Keep the free Render demo on disposable SQLite; for persistent staging use
+  `deployment/render-sqlserver-staging.yaml` with external SQL Server, paid
+  private disk for prescription files, HTTPS, SMTP, and backups. Real databases
+  and live deployment require separately provisioned infrastructure and secrets.
+- Read `docs/SPRINT8_SQLSERVER_AR.md` before migrating any existing database.

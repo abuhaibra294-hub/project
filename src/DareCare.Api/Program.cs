@@ -221,7 +221,8 @@ app.MapGet("/health/ready", async (DareCareDbContext db, CancellationToken ct) =
 {
     try
     {
-        if (await db.Database.CanConnectAsync(ct))
+        if (await db.Database.CanConnectAsync(ct) &&
+            (useSqlite || !(await db.Database.GetPendingMigrationsAsync(ct)).Any()))
             return Results.Ok(new { status = "ready", service = "DareCare.Api" });
     }
     catch (Exception) when (!ct.IsCancellationRequested) { /* Do not leak connection strings. */ }
@@ -233,10 +234,20 @@ app.MapGet("/health/ready", async (DareCareDbContext db, CancellationToken ct) =
 // EnsureCreated is intentionally NOT used for SQL Server, where schema evolution matters.
 using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<DareCareDbContext>();
     if (useSqlite)
-    {
-        var db = scope.ServiceProvider.GetRequiredService<DareCareDbContext>();
         await db.Database.EnsureCreatedAsync();
+    else
+    {
+        // Never modify a persistent SQL Server database from API startup.
+        // Migrations must be explicitly reviewed and applied by a deployment
+        // operator before bringing this API online.
+        var pendingMigrations = (await db.Database.GetPendingMigrationsAsync()).ToArray();
+        if (pendingMigrations.Length != 0)
+            throw new InvalidOperationException(
+                "SQL Server schema is not ready: apply the checked-in EF Core migrations " +
+                "before starting DareCare. Pending migrations: " +
+                string.Join(", ", pendingMigrations));
     }
     // A new Staging SQL database has no Admin; allow a ONE-TIME opt-in bootstrap.
     // Remove AllowOneTimeStaging + credentials after the first successful initialization.
