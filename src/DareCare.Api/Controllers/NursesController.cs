@@ -1,3 +1,4 @@
+using System.Data;
 using DareCare.Api.Security;
 using DareCare.Application.Contracts;
 using DareCare.Domain;
@@ -183,13 +184,30 @@ public sealed class NursesController(DareCareDbContext db) : ControllerBase
         if (start < now.AddMinutes(10) || start > now.AddDays(90) ||
             end <= start || end - start > TimeSpan.FromHours(24))
             return BadRequest(new { message = "Slot must start 10 minutes to 90 days in the future, with 0-24 hour duration." });
-        var overlaps = await db.AvailabilitySlots.AnyAsync(x =>
-            x.NurseProfileId == nurse.Id && x.StartsAtUtc < end && x.EndsAtUtc > start, ct);
-        if (overlaps) return Conflict(new { message = "Slot overlaps an existing availability window." });
-        var slot = new AvailabilitySlot { NurseProfileId = nurse.Id, StartsAtUtc = start, EndsAtUtc = end };
-        db.AvailabilitySlots.Add(slot);
-        await db.SaveChangesAsync(ct);
-        return Created($"/api/v1/nurses/{nurse.Id}/slots", new { slot.Id, slot.StartsAtUtc, slot.EndsAtUtc });
+        // An overlap check without a transaction is not sufficient: concurrent
+        // requests could each observe an empty window and insert overlapping slots.
+        // SQL Server holds serializable key-range locks; SQLite serializes writers.
+        try
+        {
+            await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
+            var overlaps = await db.AvailabilitySlots.AnyAsync(x =>
+                x.NurseProfileId == nurse.Id && x.StartsAtUtc < end && x.EndsAtUtc > start, ct);
+            if (overlaps) return Conflict(new { message = "Slot overlaps an existing availability window." });
+
+            var slot = new AvailabilitySlot { NurseProfileId = nurse.Id, StartsAtUtc = start, EndsAtUtc = end };
+            db.AvailabilitySlots.Add(slot);
+            await db.SaveChangesAsync(ct);
+            await tx.CommitAsync(ct);
+            return Created($"/api/v1/nurses/{nurse.Id}/slots", new { slot.Id, slot.StartsAtUtc, slot.EndsAtUtc });
+        }
+        catch (DbUpdateException ex) when (DbConflict.IsUniqueViolation(ex))
+        {
+            return Conflict(new { message = "An availability window was created concurrently. Reload and retry." });
+        }
+        catch (Exception ex) when (DbConflict.IsRetryableWriteConflict(ex))
+        {
+            return Conflict(new { message = "Availability changed concurrently. Reload and retry." });
+        }
     }
 
     [HttpGet("{nurseId:guid}/slots")]
