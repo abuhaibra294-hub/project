@@ -136,7 +136,18 @@ public sealed class Sprint7AvailabilityTests
         var saved = await db.Bookings.SingleAsync(b => b.Id == original.Id);
         saved.TransitionTo(BookingStatus.Rejected);
         await db.SaveChangesAsync();
-        db.Bookings.Add(second);
+        // A failed SaveChanges leaves the rejected instance's navigation graph
+        // attached to detached entities after ChangeTracker.Clear(). Retry with a
+        // fresh aggregate to model the separate HTTP request accurately.
+        db.Bookings.Add(new Booking
+        {
+            PatientUserId = patientB.Id,
+            NurseProfileId = nurse.Id,
+            AvailabilitySlotId = slot.Id,
+            CareServiceId = service.Id,
+            ServiceAddress = "Synthetic address 456",
+            PriceAtBooking = service.BasePrice
+        });
         await db.SaveChangesAsync();
         Assert.Equal(2, await db.Bookings.CountAsync(b => b.AvailabilitySlotId == slot.Id));
     }
