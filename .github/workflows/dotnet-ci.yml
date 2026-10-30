@@ -35,16 +35,31 @@ jobs:
           docker run --detach --name darecare-render-demo-ci \
             -p 127.0.0.1:18080:8080 \
             -e Jwt__Key="$(openssl rand -hex 48)" \
+            -e RENDER_GIT_COMMIT="$GITHUB_SHA" \
             darecare-render-demo:ci
           trap 'docker logs --tail 100 darecare-render-demo-ci; docker rm -f darecare-render-demo-ci >/dev/null 2>&1 || true' EXIT
           for attempt in $(seq 1 45); do
             if curl --silent --fail http://127.0.0.1:18080/health/ready > /tmp/darecare-ready.json; then
               grep -q '"status":"ready"' /tmp/darecare-ready.json
               curl --silent --fail http://127.0.0.1:18080/openapi/v1.json > /dev/null
-              python3 scripts/ci_http_smoke.py
+              DARECARE_EXPECTED_COMMIT="$GITHUB_SHA" python3 scripts/ci_http_smoke.py
               exit 0
             fi
             sleep 2
           done
           echo "DareCare did not become ready from Docker defaults." >&2
           exit 1
+      - name: Explicit SQL Server mode cannot silently fall back to disposable SQLite
+        shell: bash
+        run: |
+          set -euo pipefail
+          if docker run --rm \
+            -e Database__Provider=SqlServer \
+            -e Demo__AllowStagingSqlite=true \
+            -e Jwt__Key="$(openssl rand -hex 48)" \
+            darecare-render-demo:ci > "$RUNNER_TEMP/sql-mode-validation.log" 2>&1; then
+            echo "ERROR: SQL Server without a connection string unexpectedly booted."
+            exit 1
+          fi
+          grep -q 'Set ConnectionStrings:DefaultConnection' "$RUNNER_TEMP/sql-mode-validation.log"
+          echo "PASS fail-closed SQL Server configuration validation."

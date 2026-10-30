@@ -69,6 +69,12 @@ def register_patient(name):
 def main():
     ready = expect("GET", "/health/ready", 200)
     assert ready["status"] == "ready"
+    expected_commit = os.environ.get("DARECARE_EXPECTED_COMMIT")
+    if expected_commit:
+        health = expect("GET", "/health", 200)
+        assert health.get("deployedCommit") == expected_commit, (
+            "deployed SHA does not match expected Git commit"
+        )
     openapi = expect("GET", "/openapi/v1.json", 200)
     assert len(openapi.get("paths", {})) >= 20, "runtime OpenAPI missing routes"
     expect("GET", "/api/v1/auth/me", 401)

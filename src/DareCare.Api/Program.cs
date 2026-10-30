@@ -20,15 +20,9 @@ var demoSqlite = builder.Environment.IsStaging() &&
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var databaseProvider = builder.Configuration["Database:Provider"]?.Trim() ??
     (demoSqlite ? "Sqlite" : "SqlServer");
-// This *disposable demo branch* is allowed to start without an external SQL Server.
-// If Render has stale SQL Server defaults but no connection string, respect the
-// explicit Staging demo opt-in and use temporary SQLite instead.
-if (demoSqlite && databaseProvider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase) &&
-    string.IsNullOrWhiteSpace(connectionString))
-{
-    Console.WriteLine("DareCare disposable Staging demo: no SQL Server connection configured; selecting temporary SQLite.");
-    databaseProvider = "Sqlite";
-}
+// Never turn an explicitly selected SQL Server into disposable SQLite just
+// because its connection string is missing. Fail closed instead. This prevents
+// staging from silently creating a fresh, empty patient database on redeploy.
 Console.WriteLine($"DareCare startup: environment={builder.Environment.EnvironmentName}, databaseProvider={databaseProvider}, disposableDemo={demoSqlite}");
 var useSqlite = databaseProvider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase);
 if (useSqlite && !builder.Environment.IsDevelopment() && !demoSqlite)
@@ -172,6 +166,11 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+// Render injects the exact Git commit deployed in this process. Expose only a
+// validated public SHA, never runtime secrets, to diagnose stale deployments.
+var deployedCommit = builder.Configuration["RENDER_GIT_COMMIT"];
+if (deployedCommit?.Length != 40 || !deployedCommit.All(Uri.IsHexDigit))
+    deployedCommit = null;
 // Production never exposes API metadata. Staging may opt in for integration testing.
 var enableDocs = app.Environment.IsDevelopment() ||
     (app.Environment.IsStaging() && app.Configuration.GetValue<bool>("ApiDocs:EnableInStaging"));
@@ -215,7 +214,9 @@ app.MapControllers();
 // Liveness indicates that Kestrel is running; readiness verifies the real database.
 app.MapGet("/health", () => Results.Ok(new
 {
-    status = "healthy", service = "DareCare.Api", databaseProvider = useSqlite ? "Sqlite" : "SqlServer"
+    status = "healthy", service = "DareCare.Api",
+    databaseProvider = useSqlite ? "Sqlite" : "SqlServer",
+    deployedCommit
 }));
 app.MapGet("/health/ready", async (DareCareDbContext db, CancellationToken ct) =>
 {
