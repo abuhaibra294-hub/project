@@ -43,6 +43,9 @@ jobs:
               grep -q '"status":"ready"' /tmp/darecare-ready.json
               curl --silent --fail http://127.0.0.1:18080/openapi/v1.json > /dev/null
               DARECARE_EXPECTED_COMMIT="$GITHUB_SHA" python3 scripts/ci_http_smoke.py
+              python3 scripts/verify_render_release.py \
+                --base-url http://127.0.0.1:18080 --expected-commit "$GITHUB_SHA" \
+                --retries 1
               exit 0
             fi
             sleep 2

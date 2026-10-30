@@ -121,8 +121,7 @@ The quick-start SQLite DB is now `darecare-sprint5-dev.db`; SQL Server LocalDB u
   connection: it no longer falls back to disposable Staging SQLite.
 - `GET /health` includes the optional `deployedCommit` from Render's public
   `RENDER_GIT_COMMIT` environment variable (no credentials or tokens).
-- Manually run `Verify Render deployed commit (read-only)` on the
-  `darecare-demo-free` branch to compare the **live** Render commit with
-  the selected GitHub branch; this does not redeploy or mutate accounts.
+- Run `scripts/verify_render_release.py` with the **expected GitHub SHA**
+  to compare the live Render commit; read-only, no redeploy or account changes.
 - See `docs/SPRINT9_UPLOAD_RELEASE_SAFETY_AR.md`. The free Render service
   currently uses **ephemeral SQLite**, unsuitable for real patient data.
