@@ -21,3 +21,5 @@
 .mode-tabs button:focus-visible,.profile-field input:focus-visible,.profile-field textarea:focus-visible,.skill-choice:focus-within{outline:3px solid #eeac52;outline-offset:2px}
 @media(max-width:760px){.profile-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.profile-form{grid-template-columns:1fr}.profile-form>button{justify-self:stretch}.mode-tabs button{font-size:10px}.skill-choice{flex:1 1 auto}}
+
+.admin-entry{color:#d6eee6;font-size:11px;font-weight:800;text-decoration:underline;text-underline-offset:4px}.admin-entry:hover{color:#fff}
