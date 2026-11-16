@@ -1,0 +1,16 @@
+name: DareCare Lite live post-deploy QA
+on:
+  pull_request:
+    branches: [darecare-demo-free]
+    paths:
+      - .github/workflows/darecare-postdeploy-check.yml
+permissions:
+  contents: read
+jobs:
+  verify-render-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify real Render public homepage and static assets (read-only)
+        run: python3 scripts/verify_lite_site.py --attempts 6 --interval 20
