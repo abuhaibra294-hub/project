@@ -43,7 +43,7 @@ def check():
     if "noindex" not in h.get("X-Robots-Tag", "").lower():
         raise ValueError("Admin login is not marked noindex")
     js, _ = get("/assets/darecare-admin.js")
-    for marker in ("roles.includes('Admin')", "/api/v1/admin/overview", "localStorage"):
+    for marker in ("roles.includes('Admin')", "/api/v1/admin/overview"):
         if marker not in js:
             raise ValueError("Admin JS missing marker " + marker)
     # localStorage must only occur in an explicit comment asserting no persistence.
