@@ -172,6 +172,39 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+
+// DareCare Lite is mounted by this very API in Development/Staging. This gives
+// browser clients the exact same origin as /api/v1, without cross-origin CORS,
+// additional hosting, or exposing other Development-only wwwroot files.
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
+{
+    var liteRoot = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+    app.MapGet("/", (HttpContext ctx) =>
+    {
+        ctx.Response.Headers["Cache-Control"] = "no-store";
+        ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        ctx.Response.Headers["X-Frame-Options"] = "DENY";
+        ctx.Response.Headers["Referrer-Policy"] = "no-referrer";
+        ctx.Response.Headers["Content-Security-Policy"] =
+            "default-src 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; " +
+            "form-action 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'";
+        return Results.File(Path.Combine(liteRoot, "darecare-lite.html"), "text/html; charset=utf-8");
+    }).WithName("DareCareLiteHome");
+
+    app.MapGet("/assets/darecare-lite.css", (HttpContext ctx) =>
+    {
+        ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        ctx.Response.Headers["Cache-Control"] = "no-store";
+        return Results.File(Path.Combine(liteRoot, "darecare-lite.css"), "text/css; charset=utf-8");
+    }).WithName("DareCareLiteCss");
+
+    app.MapGet("/assets/darecare-lite.js", (HttpContext ctx) =>
+    {
+        ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        ctx.Response.Headers["Cache-Control"] = "no-store";
+        return Results.File(Path.Combine(liteRoot, "darecare-lite.js"), "text/javascript; charset=utf-8");
+    }).WithName("DareCareLiteJs");
+}
 // Production never exposes API metadata. Staging may opt in for integration testing.
 var enableDocs = app.Environment.IsDevelopment() ||
     (app.Environment.IsStaging() && app.Configuration.GetValue<bool>("ApiDocs:EnableInStaging"));
