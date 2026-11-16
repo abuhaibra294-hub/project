@@ -9,7 +9,7 @@
 
 **المتاح في المستودع:**
 - [دليل العقود وتوزيع الفريق](TEAM_HANDOFF_AR.md).
-- [Postman Collection](../integration/DareCare_Postman_Collection.json) و[بيئة Postman محلية بدون أسرار](../integration/DareCare_Local.postman_environment.json).
+- [Postman Collection](../integration/DareCare_Postman_Collection.json)، و[بيئة Render Staging جاهزة للاستيراد وبدون أسرار](../integration/DareCare_RenderStaging.postman_environment.json)، و[بيئة محلية](../integration/DareCare_Local.postman_environment.json).
 - [فهرس المسارات والأدوار](../integration/DareCare_API_Endpoints.json).
 - [مثال Flutter](../integration/client-examples/darecare_flutter_api.dart) و[مثال Web JavaScript](../integration/client-examples/darecare_web_client.mjs).
 - [لقطة OpenAPI مستخرجة من المصدر](../integration/DareCare_OpenAPI_SourceSnapshot.json) **للمراجعة فقط**؛ المرجع النهائي هو `GET /openapi/v1.json` من الخدمة الفعلية وقت التشغيل.
@@ -25,7 +25,9 @@
 
 **عنوان التطوير المحلي في Postman:** `http://127.0.0.1:5208`. هذا عنوان جهاز مطور الـBackend فقط؛ لن يعمل تلقائيًا على أجهزة الفريق الأخرى. يشترط في اتصال الإنترنت HTTPS.
 
-**عنوان Render المذكور في ملاحظات المشروع:** `https://project-kv53.onrender.com` — **غير مثبت الجاهزية بتاريخ هذه الوثيقة**؛ لا تسلمه كخدمة مؤكدة قبل اختبار `/health/ready` وOpenAPI والتكامل الكامل. Render Free يحتفظ ببيانات SQLite مؤقتة فقط؛ إعادة التشغيل أو النشر قد تفقد الحسابات والملفات التجريبية.
+**عنوان Staging الذي اجتاز فحص قراءة حقيقي يوم 16 نوفمبر 2026:** `https://project-kv53.onrender.com`. أثبت [فحص GitHub Actions رقم 43859647527](https://github.com/abuhaibra294-hub/project/actions/runs/43859647527) أن `/health/ready` يعيد 200، وأن Live OpenAPI يحتوي الـ93 مسارًا المطلوبة، وأن اكتشاف الخدمات والممرضين يعيد 200، ومسارات الحساب/الإدارة بدون JWT تعيد 401. المسارات الثلاثة الإضافية هي `/docs` و`/health` و`/health/ready` وليست نقصًا بالعقد.
+
+**ما لم يُثبت:** السيرفر لا يعرض `deployedCommit` حاليًا، لذلك لا يمكن الجزم برقم الـSHA المنشور؛ ولم يُنفذ حتى الآن اختبار تسجيل دخول وحجز وطلب دواء على **نفس الخدمة العامة**، ولا فحص CORS من Origin الويب الحقيقي. [الاختبار الآلي القابل للإعادة](../scripts/verify_frontend_staging.py) قراءة فقط. Render Free يستخدم SQLite مؤقتة؛ إعادة التشغيل أو النشر قد تفقد الحسابات والملفات التجريبية. لا تستخدم أي بيانات مرضى حقيقية.
 
 ## 3. خريطة الربط حسب العضو
 
@@ -56,7 +58,8 @@
 - [CI بناء .NET واختبار API ومشغّل Render Docker: ناجح](https://github.com/abuhaibra294-hub/project/actions/runs/41111309898).
 - [CI SQL Server migrations وHTTP/auth/restart: ناجح](https://github.com/abuhaibra294-hub/project/actions/runs/41111309966).
 - [Sprint 9 PR #3](https://github.com/abuhaibra294-hub/project/pull/3) **لا يزال Draft وغير مدموج** في `darecare-demo-free` وقت المراجعة. نجاح الـCI لهذا الفرع لا يعني أن Render يشغّله.
-- **لم تُثبت** استجابة Render العامة، أو SHA المنشور، أو CORS الفعلي، أو توفر حسابات تجريبية صالحة على الـStaging. لا تسجل هذه البنود كناجحة حتى تُختبر مباشرة.
+- **تم إثبات** جاهزية Render الأساسية والعقد العام والمسارات العامة وصلاحيات الطلبات بدون JWT: [نتيجة فحص ناجحة](https://github.com/abuhaibra294-hub/project/actions/runs/43859647527).
+- **لم يُثبت بعد** SHA المنشور أو CORS الفعلي أو تدفق حسابات تجريبية مصادق عليها على الـStaging. لا تسجل هذه البنود كناجحة قبل اختبارها.
 
 ## 6. معيار تسليم 'الربط شغال' بدلاً من 'الكود موجود'
 
