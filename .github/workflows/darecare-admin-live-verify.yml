@@ -1,0 +1,16 @@
+name: DareCare Admin alias public read-only verification
+on:
+  pull_request:
+    branches: [darecare-demo-free]
+    paths:
+      - .github/workflows/darecare-admin-live-verify.yml
+permissions:
+  contents: read
+jobs:
+  live-admin-alias:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test published Admin aliases, assets and protected API
+        run: python3 scripts/verify_admin_live.py
