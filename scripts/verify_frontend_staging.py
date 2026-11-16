@@ -106,9 +106,17 @@ def check(base, manifest_path, attempts, interval, timeout, origin=None):
                 if o.scheme != "https" or not o.netloc or o.path not in ("", "/") or o.query or o.fragment:
                     raise ValueError("Frontend origin must be an HTTPS origin.")
                 headers = {"Origin": origin.rstrip("/"), "Access-Control-Request-Method": "GET"}
-                status, _ = fetch(base, "/api/v1/nurses/search", method="OPTIONS", headers=headers, timeout=timeout)
-                print(f"[INFO] Browser preflight response: {status}; allow-origin requires header inspection.")
-                # Do not claim a CORS PASS unless the actual Access-Control-Allow-Origin header is checked.
+                req = Request(base + "/api/v1/nurses/search", headers=headers, method="OPTIONS")
+                try:
+                    with urlopen(req, timeout=timeout) as response:
+                        status = response.status
+                        allowed = response.headers.get("Access-Control-Allow-Origin")
+                except HTTPError as response:
+                    status = response.code
+                    allowed = response.headers.get("Access-Control-Allow-Origin")
+                if status not in (200, 204) or allowed != origin.rstrip("/"):
+                    raise ValueError(f"CORS preflight failed: status={status}, allow-origin={allowed!r}")
+                print("[PASS] Browser preflight matches exact HTTPS frontend origin.")
             print("[PASS] READ-ONLY staging probe. Authenticated E2E and browser CORS still require separate tests.")
             return 0
         except (URLError, OSError, ValueError, TimeoutError) as exc:
