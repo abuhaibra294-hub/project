@@ -48,8 +48,12 @@ jobs:
                 http://127.0.0.1:18080/ > /tmp/darecare-lite.html
               grep -q 'DARECARE' /tmp/darecare-lite.html
               grep -qi 'content-security-policy:' /tmp/darecare-lite-headers.txt
-              curl --silent --show-error --fail http://127.0.0.1:18080/assets/darecare-lite.css | grep -q 'root'
-              curl --silent --show-error --fail http://127.0.0.1:18080/assets/darecare-lite.js | grep -q 'DareCare Lite'
+              curl --silent --show-error --fail \
+                http://127.0.0.1:18080/assets/darecare-lite.css > /tmp/darecare-lite.css
+              grep -q 'root' /tmp/darecare-lite.css
+              curl --silent --show-error --fail \
+                http://127.0.0.1:18080/assets/darecare-lite.js > /tmp/darecare-lite.js
+              grep -q 'DareCare Lite' /tmp/darecare-lite.js
               # The Development-only auth lab must remain inaccessible in Staging.
               test "$(curl --silent --output /dev/null --write-out '%{http_code}' \
                 http://127.0.0.1:18080/auth.html)" = 404
