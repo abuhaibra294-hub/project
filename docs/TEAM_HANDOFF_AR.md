@@ -1,6 +1,6 @@
 # DareCare — حزمة التسليم لـ Flutter وFrontend (Sprint 6)
 
-> **الحالة الصادقة:** هذه حزمة التكامل مشتقة من الكود الفعلي. اجتاز استخراج المسارات والفحص الثابت؛ **لم يُشغَّل Build أو HTTP E2E في بيئة إعداد الحزمة** لعدم توفر .NET SDK. يجب تشغيل ملفات التحقق المحلية قبل استخدام أي رابط Staging.
+> **تحديث 16 نوفمبر 2026:** ابدأ من [دليل Flutter/Web الحديث](FRONTEND_START_HERE_AR.md) و[بيئة Postman الجاهزة لـRender](../integration/DareCare_RenderStaging.postman_environment.json). اجتاز Render فحص GitHub Actions حقيقيًا: جاهزية السيرفر وLive OpenAPI بكامل الـ93 Endpoint والمسارات العامة، [التقرير هنا](https://github.com/abuhaibra294-hub/project/actions/runs/43859647527). أما فحص Build وDocker وSQL Server فنجح أيضًا في CI. **لا تزال مصادقة الأدوار كاملةً وCORS من Origin الويب الفعلي والإصدار المنشور واستمرارية البيانات غير مثبتة**. تفاصيل Sprint 6 أدناه تاريخية، ويقدّم عليها دليل 16 نوفمبر.
 
 ## 1. ما الذي يستلمه كل مطور؟
 
@@ -99,6 +99,6 @@
 
 ## 7. بيانات الدخول وعنوان الخدمة
 
-**مهم:** لا توجد URL منشورة من طرفنا ضمن الحزمة؛ `http://127.0.0.1:5208` يعمل على جهاز الـBackend فقط، وليس رابطًا يستخدمه مطور آخر عبر الإنترنت. الاستضافة تحتاج VPS/Cloud وSQL Server وDNS وSMTP واتصال فعلي؛ راجع `docs/STAGING_DEPLOY_AR.md`.
+**تحديث 16 نوفمبر:** رابط التجربة الذي ثبتت جاهزيته للقراءة: `https://project-kv53.onrender.com`، مع [Postman Environment بلا أسرار](../integration/DareCare_RenderStaging.postman_environment.json). هذه **خدمة Render Free بقاعدة SQLite مؤقتة**؛ ليست استضافة إنتاجية، ولم يثبت تشغيل رحلة مستخدم مصادق عليها أو إعدادات الويب CORS. `http://127.0.0.1:5208` خاص بجهاز المطور المحلي فقط. الاستضافة الدائمة تحتاج SQL Server، SMTP، نسخ احتياطية وتدابير حماية كما في `docs/STAGING_DEPLOY_AR.md`.
 
 بعد إنشاء الرابط، شارك معهم فقط URL + ملف Postman **بدون أسرار**. سلّم بيانات دخول كل دور تجريبي إلى صاحبه عبر قناة خاصة منفصلة. لا تشارك كلمة سر الإدارة أو أي بيانات مرضى حقيقية.
