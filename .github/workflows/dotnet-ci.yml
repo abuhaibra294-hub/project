@@ -103,6 +103,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify existing Render domain serves UI and API without writing data
         run: python3 scripts/verify_lite_site.py --attempts 15 --interval 20
+      - name: Verify new admin alias on the public Render service (GET-only)
+        run: python3 scripts/verify_admin_live.py
   browser-lite-onboarding:
     # Browser DOM interactions are mocked; live backend writes remain loopback Docker only.
     if: github.event_name == 'pull_request'
