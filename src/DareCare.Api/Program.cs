@@ -204,6 +204,38 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
         ctx.Response.Headers["Cache-Control"] = "no-store";
         return Results.File(Path.Combine(liteRoot, "darecare-lite.js"), "text/javascript; charset=utf-8");
     }).WithName("DareCareLiteJs");
+
+    // A dedicated administration entrypoint, with /admin/login as its alias.
+    // These GETs only serve an inert frontend shell. All admin data and writes
+    // still require the existing [Authorize(Roles = AppRoles.Admin)] API guard.
+    foreach (var adminRoute in new[] { "/admin", "/admin/login" })
+    {
+        app.MapGet(adminRoute, (HttpContext ctx) =>
+        {
+            ctx.Response.Headers["Cache-Control"] = "no-store, private";
+            ctx.Response.Headers["Pragma"] = "no-cache";
+            ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+            ctx.Response.Headers["X-Frame-Options"] = "DENY";
+            ctx.Response.Headers["X-Robots-Tag"] = "noindex, nofollow, noarchive";
+            ctx.Response.Headers["Referrer-Policy"] = "no-referrer";
+            ctx.Response.Headers["Content-Security-Policy"] =
+                "default-src 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; " +
+                "form-action 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'";
+            return Results.File(Path.Combine(liteRoot, "darecare-admin.html"), "text/html; charset=utf-8");
+        });
+    }
+    app.MapGet("/assets/darecare-admin.css", (HttpContext ctx) =>
+    {
+        ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        ctx.Response.Headers["Cache-Control"] = "no-store";
+        return Results.File(Path.Combine(liteRoot, "darecare-admin.css"), "text/css; charset=utf-8");
+    }).WithName("DareCareAdminCss");
+    app.MapGet("/assets/darecare-admin.js", (HttpContext ctx) =>
+    {
+        ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        ctx.Response.Headers["Cache-Control"] = "no-store";
+        return Results.File(Path.Combine(liteRoot, "darecare-admin.js"), "text/javascript; charset=utf-8");
+    }).WithName("DareCareAdminJs");
 }
 // Production never exposes API metadata. Staging may opt in for integration testing.
 var enableDocs = app.Environment.IsDevelopment() ||
