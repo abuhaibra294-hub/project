@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="DareCare — واجهة تجريبية للرعاية المنزلية متصلة بالـAPI مباشرة">
+  <title>DareCare | رعايتك في مكانك</title>
+  <link rel="stylesheet" href="/assets/darecare-lite.css">
+  <script src="/assets/darecare-lite.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="shell navrow">
+    <a href="/" class="logo" aria-label="DareCare الرئيسية"><span class="logo-icon" aria-hidden="true">✚</span><span>DARE<span class="logo-accent">CARE</span><small>رعاية أقرب ليك</small></span></a>
+    <nav class="navlinks" aria-label="القائمة الرئيسية"><a href="#services">الخدمات</a><a href="#nurses">فريق التمريض</a><a href="#pharmacies">الصيدليات</a><a href="#dashboard" id="dashLink" hidden>حسابي</a></nav>
+    <div class="nav-actions"><span class="trial-label">نسخة تجريبية</span><button class="btn btn-solid btn-sm" id="authBtn" type="button">دخول / حساب جديد</button><button class="btn btn-outline btn-sm" id="logoutBtn" type="button" hidden>خروج</button></div>
+  </div>
+</header>
+<main>
+  <section class="hero"><div class="shell hero-inner">
+    <div class="hero-copy"><span class="eyebrow"><span class="live-dot"></span> منصة الرعاية المنزلية</span><h1>رعاية تطمّنك.<br><em>من غير ما تتحرك من بيتك.</em></h1><p>اختار الخدمة اللي محتاجها، اكتشف طاقم تمريض معتمد، وحدد الوقت المناسب. كل خطوة مرتبطة بنظام DareCare الحقيقي.</p>
+    <div class="hero-buttons"><a class="btn btn-light" href="#services">استكشف خدماتنا <span aria-hidden="true">←</span></a><a class="btn btn-ghost-light" href="#nurses">اعرف طاقم التمريض</a></div>
+    <div class="hero-foot"><span>✓ مقدمو خدمة معتمدون</span><span>✓ حجز بالوقت المتاح</span><span>✓ متابعة حالة الطلب</span></div></div>
+    <div class="hero-display" aria-hidden="true"><div class="orb orb-one"></div><div class="orb orb-two"></div><div class="care-art"><div class="art-top"><span class="art-star">✦</span><span>CARE FOR YOU</span></div><div class="art-icon">✚</div><div class="art-title">الرعاية تبدأ من هنا</div><div class="art-caption">اهتمام حقيقي، في كل خطوة</div><div class="art-progress"><i></i><i></i><i></i></div></div><div class="float-pill"><span>♡</span> راحتك أولويتنا</div></div>
+  </div></section>
+  <section class="section shell" id="services"><div class="section-heading"><div><span class="section-kicker">خدمات الرعاية</span><h2>ابدأ بالخدمة اللي تناسبك</h2><p>الخدمات والأسعار بتتسحب من قاعدة البيانات مباشرة.</p></div><span class="hint-tag">الأسعار بالجنيه المصري</span></div><div class="cards services-cards" id="serviceList" aria-live="polite"><p class="empty">جارِ تحميل الخدمات...</p></div></section>
+  <section class="section section-soft" id="nurses"><div class="shell"><div class="section-heading"><div><span class="section-kicker">مقدمو الرعاية</span><h2>اختار الشخص المناسب</h2><p>بيظهر هنا بس فريق التمريض المعتمد والمتاح للبحث.</p></div><form id="searchNurses" class="searchbox" role="search"><label class="sr-only" for="citySearch">ابحث بالمدينة</label><input type="search" id="citySearch" placeholder="ابحث بالمدينة..." maxlength="120"><button type="submit" class="btn btn-solid btn-sm">بحث</button></form></div><div class="cards nurse-cards" id="nurseList" aria-live="polite"><p class="empty">جارِ تحميل التمريض...</p></div></div></section>
+  <section class="shell section" id="bookingPanel" hidden><div class="booking-box"><div><span class="section-kicker">طلب زيارة</span><h2>كمّل تفاصيل الحجز</h2><p id="bookingIntro" class="muted">اختار خدمة وممرض أولًا.</p></div><form id="bookingForm" class="booking-form"><div class="field"><label for="slotSelect">الموعد المتاح</label><select id="slotSelect" required><option value="">اختر موعدًا</option></select></div><div class="field"><label for="visitAddress">عنوان الزيارة بالتفصيل</label><input id="visitAddress" required minlength="8" maxlength="400" placeholder="المدينة، الشارع، رقم العمارة والشقة" autocomplete="street-address"></div><button type="submit" class="btn btn-solid">تأكيد طلب الحجز</button></form><p class="fine">الزيارة تُرسل كطلب مبدئي، ويؤكدها الممرض من حسابه.</p></div></section>
+  <section class="section shell" id="pharmacies"><div class="section-heading"><div><span class="section-kicker">خدمات الأدوية</span><h2>صيدليات شريكة</h2><p>اختار صيدلية معتمدة وارفع روشتة تجريبية من حساب المريض.</p></div></div><div class="cards pharmacy-cards" id="pharmacyList" aria-live="polite"><p class="empty">جارِ تحميل الصيدليات...</p></div><form id="rxForm" class="rx-form" hidden><div class="field"><label for="rxPharmacy">اختار الصيدلية</label><select id="rxPharmacy" required></select></div><div class="field"><label for="rxFile">ملف الروشتة (PDF أو صورة، حتى 8MB)</label><input type="file" id="rxFile" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" required></div><div class="field"><label for="rxNotes">ملاحظة اختيارية</label><input id="rxNotes" maxlength="1000" placeholder="أي ملاحظة للصيدلية"></div><button type="submit" class="btn btn-solid">رفع الروشتة</button><span class="fine">بيانات تجريبية فقط — ممنوع رفع روشتات أو بيانات مرضى حقيقية.</span></form></section>
+  <section class="section section-soft" id="dashboard" hidden><div class="shell"><div class="section-heading"><div><span class="section-kicker">مساحة حسابك</span><h2 id="dashboardTitle">حسابي</h2><p id="dashboardLead">بياناتك المباشرة من DareCare.</p></div><button class="btn btn-outline btn-sm" id="refreshDashboard" type="button">تحديث البيانات ↻</button></div><div class="stat-grid" id="stats"></div><div id="accountSections" class="account-sections" aria-live="polite"></div></div></section>
+  <section class="closing shell"><div><span class="section-kicker">DARECARE</span><h2>رعاية بسيطة وقريبة.</h2><p>بنجرّب هنا الواجهة مع الباك إند الحقيقي قبل النسخة النهائية.</p></div><a href="#services" class="btn btn-solid">اختار خدمتك</a></section>
+</main>
+<footer><div class="shell footrow"><span>DARECARE <b>✚</b> — مشروع تخرج تجريبي</span><span>لا تستخدم بيانات طبية حقيقية على النسخة التجريبية.</span></div></footer>
+<dialog id="authDialog" aria-labelledby="authTitle"><div class="modal-head"><div><span class="section-kicker">أهلاً بيك</span><h2 id="authTitle">الدخول إلى DareCare</h2></div><button type="button" class="icon-btn" id="closeAuth" aria-label="إغلاق">×</button></div><div class="mode-tabs"><button class="active" id="loginMode" type="button">تسجيل الدخول</button><button id="registerMode" type="button">حساب مريض جديد</button></div><form id="authForm"><div class="field" id="nameField" hidden><label for="fullName">الاسم بالكامل</label><input id="fullName" autocomplete="name" minlength="2" maxlength="160"></div><div class="field"><label for="email">البريد الإلكتروني</label><input type="email" id="email" autocomplete="email" required></div><div class="field" id="phoneField" hidden><label for="phone">رقم الهاتف</label><input type="tel" id="phone" autocomplete="tel" maxlength="32"></div><div class="field"><label for="password">كلمة المرور</label><input type="password" id="password" autocomplete="current-password" required></div><p class="fine" id="passwordTip" hidden>استخدم 12 حرفًا على الأقل، وأحرف كبيرة وصغيرة ورقمًا ورمزًا خاصًا.</p><button type="submit" class="btn btn-solid btn-wide" id="authSubmit">دخول</button></form><p class="fine">تجربة فحسب: الجلسة لا تُحفظ في المتصفح، وستحتاج تسجيل الدخول بعد تحديث الصفحة.</p></dialog>
+<div role="status" aria-live="polite" id="toast" class="toast" hidden></div>
+</body>
+</html>
