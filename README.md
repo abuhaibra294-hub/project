@@ -1,3 +1,5 @@
+> **Frontend integration handoff (16 Nov 2026):** Start with [Arabic Flutter/Web integration guide](docs/FRONTEND_START_HERE_AR.md) and the [verified, secret-free Render Postman environment](integration/DareCare_RenderStaging.postman_environment.json). [GitHub Actions live probe passed](https://github.com/abuhaibra294-hub/project/actions/runs/43859647527): Render Free SQLite is ready and all 93 expected operations are in Live OpenAPI. This is **synthetic staging only**; deployed SHA, authenticated production-like workflow, browser CORS, and permanent persistence are NOT yet verified. Earlier Sprint 6 notes below are historical and must not override this status.
+
 > **GitHub:** To create a new private DareCare.Backend repository without touching unrelated repos, run `PUBLISH_TO_GITHUB.cmd` on Windows. See `docs/GITHUB_PUBLISH_AR.md`.
 
 # DareCare — ASP.NET Core .NET 10 Backend (Sprint 6 / Team Handoff)

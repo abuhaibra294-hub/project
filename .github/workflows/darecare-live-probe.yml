@@ -1,0 +1,25 @@
+name: DareCare public staging readiness (read-only)
+
+on:
+  pull_request:
+    branches: [darecare-demo-free]
+    paths:
+      - scripts/verify_frontend_staging.py
+      - .github/workflows/darecare-live-probe.yml
+      - integration/DareCare_API_Endpoints.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staging-readonly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe public API (GET/OPTIONS only, no credentials or writes)
+        run: |
+          python3 scripts/verify_frontend_staging.py \
+            --base-url https://project-kv53.onrender.com \
+            --attempts 4 --interval 20 --timeout 45
