@@ -34,9 +34,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # CI-only, synthetic one-time bootstrap. Never send this secret to Render.
+          admin_pass="CI_Admin_Test!$(openssl rand -hex 18)Aa1"
           docker run --detach --name darecare-render-demo-ci \
             -p 127.0.0.1:18080:8080 \
             -e Jwt__Key="$(openssl rand -hex 48)" \
+            -e BootstrapAdmin__AllowOneTimeStaging=true \
+            -e BootstrapAdmin__Email=ci-admin@example.test \
+            -e BootstrapAdmin__Password="$admin_pass" \
             darecare-render-demo:ci
           trap 'docker logs --tail 100 darecare-render-demo-ci; docker rm -f darecare-render-demo-ci >/dev/null 2>&1 || true' EXIT
           for attempt in $(seq 1 45); do
@@ -59,6 +64,9 @@ jobs:
                 http://127.0.0.1:18080/auth.html)" = 404
               echo 'PASS: same-domain DareCare Lite homepage, CSS, JS and private dev lab restrictions.'
               python3 scripts/ci_http_smoke.py
+              DARECARE_CI_ADMIN_EMAIL=ci-admin@example.test \
+                DARECARE_CI_ADMIN_PASSWORD="$admin_pass" \
+                python3 scripts/ci_onboarding_booking.py
               exit 0
             fi
             sleep 2
