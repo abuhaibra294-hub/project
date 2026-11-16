@@ -83,3 +83,19 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify existing Render domain serves UI and API without writing data
         run: python3 scripts/verify_lite_site.py --attempts 15 --interval 20
+  browser-lite-onboarding:
+    # Browser DOM interactions are mocked; live backend writes remain loopback Docker only.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install headless browser
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Browser nurse/admin/patient actions and mobile overflow
+        run: python scripts/ci_lite_browser.py
