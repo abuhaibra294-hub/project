@@ -65,3 +65,13 @@ jobs:
           done
           echo "DareCare did not become ready from Docker defaults." >&2
           exit 1
+  deployed-lite-readonly:
+    # The public service may auto-deploy after a merge; confirm actual runtime, not just GitHub.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/darecare-demo-free'
+    needs: [render-free-container-smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify existing Render domain serves UI and API without writing data
+        run: python3 scripts/verify_lite_site.py --attempts 15 --interval 20
