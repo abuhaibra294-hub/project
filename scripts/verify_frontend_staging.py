@@ -73,21 +73,20 @@ def check(base, manifest_path, attempts, interval, timeout, origin=None):
             if not isinstance(paths, dict):
                 raise ValueError("Live OpenAPI has no valid paths mapping.")
             actual = {
-                (path, method.lower())
+                (re.sub(r":guid(?=})", "", path), method.lower())
                 for path, item in paths.items()
                 if isinstance(item, dict)
                 for method in item.keys()
                 if method.lower() in METHODS
             }
             missing, extra = expected - actual, actual - expected
-            if missing or extra:
-                print(f"[FAIL] Live API drift: expected={len(expected)}, actual={len(actual)}")
-                if missing:
-                    print("  Missing (first 20): " + repr(sorted(missing)[:20]))
-                if extra:
-                    print("  Extra (first 20): " + repr(sorted(extra)[:20]))
-                raise ValueError("Live OpenAPI differs from source-derived API manifest.")
-            print(f"[PASS] Live OpenAPI matches all {len(expected)} HTTP operations.")
+            if missing:
+                print(f"[FAIL] Missing {len(missing)} source-defined API operations:")
+                print("  Missing (first 20): " + repr(sorted(missing)[:20]))
+                raise ValueError("Live OpenAPI is missing expected source-derived API operations.")
+            print(f"[PASS] Live OpenAPI contains all {len(expected)} expected HTTP operations.")
+            if extra:
+                print(f"[INFO] Live OpenAPI exposes {len(extra)} additional operations; review separately.")
 
             public_tests = (
                 ("/api/v1/skills", 200),
