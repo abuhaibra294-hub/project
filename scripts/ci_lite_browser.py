@@ -216,7 +216,7 @@ def check():
             page.locator("#dashboardTitle").get_by_text("أهلاً").wait_for()
             assert page.locator("#bookingPanel").is_visible(), "booking intent lost across login"
             page.locator("#bookingForm button").click()
-            page.wait_for_function("() => document.querySelector('#accountSections')?.textContent.includes('زياراتي وحجوزاتي')")
+            page.wait_for_function("() => document.querySelector('#toast')?.textContent.includes('تم إرسال الحجز')")
             assert len(state["booked"]) == 1, "patient booking not sent"
             page.set_viewport_size({"width": 390, "height": 844})
             page.wait_for_timeout(200)
