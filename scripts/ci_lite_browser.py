@@ -205,7 +205,7 @@ def check():
             page.locator("#serviceList .card button").first.click()
             page.locator("#nurseList .card button").first.wait_for()
             page.locator("#nurseList .card button").first.click()
-            page.locator("#slotSelect option").last.wait_for()
+            page.wait_for_function("() => [...document.querySelectorAll('#slotSelect option')].some(o => o.value === 'slot1')")
             page.locator("#slotSelect").select_option("slot1")
             page.locator("#visitAddress").fill("Mansoura Synthetic Street 123")
             page.locator("#bookingForm button").click()
