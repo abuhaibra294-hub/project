@@ -100,7 +100,7 @@ def test():
 
     patient_token = register("Patient")
     call("POST", f"/api/v1/bookings/{secrets.token_hex(16)}/accept",
-         token=patient_token, expected=404)  # no privilege escalation or data leak
+         token=patient_token, expected=403)  # patient cannot call nurse-only operation
     booked = call("POST", "/api/v1/bookings", {
         "nurseProfileId": nurse_id, "availabilitySlotId": slot["id"],
         "careServiceId": service["id"], "serviceAddress": "Mansoura Synthetic Street 123"
