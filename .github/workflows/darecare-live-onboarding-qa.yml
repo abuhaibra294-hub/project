@@ -1,0 +1,57 @@
+name: DareCare public onboarding release verification (GET only)
+on:
+  pull_request:
+    branches: [darecare-demo-free]
+    paths:
+      - .github/workflows/darecare-live-onboarding-qa.yml
+permissions:
+  contents: read
+jobs:
+  live-onboarding:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Verify deployed UI feature markers and API readiness
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, time
+          from urllib.request import Request, urlopen
+          from urllib.error import HTTPError, URLError
+
+          base = "https://project-kv53.onrender.com"
+          def get(path, expected=200):
+              req = Request(base+path, headers={"Accept": "*/*","User-Agent":"DareCare-onboarding-release-readonly/1.0"})
+              try:
+                  with urlopen(req, timeout=35) as res:
+                      code, headers, body = res.status, res.headers, res.read(1000000)
+              except HTTPError as error:
+                  code, headers, body = error.code, error.headers, b""
+              if code != expected:
+                  raise ValueError(f"GET {path} expected HTTP {expected}, got {code}")
+              return body.decode("utf-8"), headers
+
+          def check():
+              ready,_ = get("/health/ready")
+              assert json.loads(ready)["status"] == "ready", "database unready"
+              html, headers = get("/")
+              assert all(x in html for x in ('id="nurseMode"', 'id="licenseField"', 'id="yearsField"')), "nurse registration UI missing"
+              assert "connect-src 'self'" in headers.get("Content-Security-Policy",""), "same-origin CSP missing"
+              js,_=get("/assets/darecare-lite.js")
+              assert all(x in js for x in ("nurseSetup(", "pendingAction", "admin/nurses/", "setMode('nurse')")), "new nurse/admin/booking JS not deployed"
+              css,_=get("/assets/darecare-lite.css")
+              assert ".onboarding-panel" in css and ".skill-picker" in css, "new responsive form styles not deployed"
+              services,_=get("/api/v1/services")
+              assert isinstance(json.loads(services),list), "services endpoint invalid"
+              get("/api/v1/auth/me",401)
+              get("/auth.html",404)
+              print("PASS public Render live: nurse registration, profile/skills, admin approval and resume booking JS+CSS; API ready; auth restricted")
+          for attempt in range(1,7):
+              try:
+                  check()
+                  break
+              except (URLError, OSError, ValueError, AssertionError, json.JSONDecodeError) as exc:
+                  print(f"ATTEMPT {attempt}/6: {exc}",flush=True)
+                  if attempt==6:raise
+                  time.sleep(20)
+          PY
