@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="description" content="بوابة إدارة DareCare التجريبية - دخول المديرين المصرّح لهم فقط">
+  <title>DareCare | بوابة الإدارة</title>
+  <link rel="stylesheet" href="/assets/darecare-admin.css">
+  <script src="/assets/darecare-admin.js" defer></script>
+</head>
+<body>
+  <div class="login-layout" id="loginScreen">
+    <aside class="brand-panel">
+      <a class="brand" href="/" aria-label="الرجوع إلى الرئيسية">
+        <span class="brand-symbol" aria-hidden="true">✚</span>
+        <span class="brand-name">DARE<span>CARE</span><small>بوابة الإدارة</small></span>
+      </a>
+      <div class="brand-content">
+        <span class="eyebrow">ADMIN CONSOLE / مساحة إدارة محمية</span>
+        <h1>إدارة أوضح.<br><em>وقرارات أسرع.</em></h1>
+        <p>متابعة الحالات والطلبات والموافقات من مساحة واحدة، مرتبطة مباشرة بالـAPI وصلاحيات الإدارة.</p>
+        <div class="brand-points"><span>◌ متابعة طلبات التمريض</span><span>◌ اعتماد الصيدليات</span><span>◌ مراجعة الحسابات</span></div>
+      </div>
+      <div class="brand-foot">DARECARE — مشروع تخرج / بيئة اختبار ببيانات وهمية فقط</div>
+      <div class="deco-circle deco-one" aria-hidden="true"></div><div class="deco-circle deco-two" aria-hidden="true"></div>
+    </aside>
+
+    <main class="login-main">
+      <div class="login-top"><span class="demo-label">نسخة تجريبية</span><a href="/" class="home-link">الرجوع للموقع <span aria-hidden="true">←</span></a></div>
+      <div class="login-card">
+        <div class="login-icon" aria-hidden="true">✚</div>
+        <p class="overline">بوابة الإدارة</p>
+        <h2>أهلًا برجوعك</h2>
+        <p class="lead">سجّل دخولك بحساب يحمل صلاحية <b>Admin</b> للوصول للوحة التحكم.</p>
+        <form id="adminLoginForm">
+          <label for="adminEmail">البريد الإلكتروني للإدارة</label>
+          <input id="adminEmail" name="email" type="email" inputmode="email" autocomplete="username" placeholder="admin@example.com" required>
+          <label for="adminPassword">كلمة المرور</label>
+          <div class="password-wrap">
+            <input id="adminPassword" name="password" type="password" autocomplete="current-password" placeholder="أدخل كلمة المرور" required>
+            <button type="button" id="togglePassword" class="password-toggle" aria-label="إظهار كلمة المرور" aria-pressed="false">إظهار</button>
+          </div>
+          <p id="loginError" class="form-error" role="alert" hidden></p>
+          <button id="loginSubmit" type="submit" class="primary-btn">دخول لوحة الإدارة <span aria-hidden="true">←</span></button>
+        </form>
+        <p class="login-note">الدخول مخصص للمسؤولين فقط. لا يوجد تسجيل حساب مدير من هذه الصفحة، ولا تُحفظ الجلسة بعد تحديث المتصفح.</p>
+      </div>
+      <div class="login-bottom">الدعم الفني للمشروع: تواصل مع مسؤول الـBackend لتفعيل حساب الإدارة بصورة آمنة.</div>
+    </main>
+  </div>
+
+  <div id="adminWorkspace" class="workspace" hidden>
+    <aside class="sidebar" id="adminSidebar">
+      <div class="sidebar-head">
+        <a href="/" class="brand brand-small" aria-label="DareCare الرئيسية"><span class="brand-symbol">✚</span><span class="brand-name">DARE<span>CARE</span><small>إدارة المنصة</small></span></a>
+      </div>
+      <p class="sidebar-caption">مساحة الإدارة</p>
+      <nav class="side-nav" aria-label="أقسام الإدارة">
+        <button type="button" class="side-link active" data-section="overview" aria-current="page"><span aria-hidden="true">◫</span> نظرة عامة</button>
+        <button type="button" class="side-link" data-section="nurses"><span aria-hidden="true">♧</span> اعتماد التمريض <span class="nav-count" id="nurseNavCount" hidden>0</span></button>
+        <button type="button" class="side-link" data-section="pharmacies"><span aria-hidden="true">✚</span> الصيدليات <span class="nav-count" id="pharmacyNavCount" hidden>0</span></button>
+        <button type="button" class="side-link" data-section="users"><span aria-hidden="true">☷</span> المستخدمون</button>
+        <button type="button" class="side-link" data-section="audit"><span aria-hidden="true">◷</span> سجل الإجراءات</button>
+      </nav>
+      <div class="sidebar-bottom"><span class="demo-label">Staging / تجربة فقط</span><p>يُمنع استخدام بيانات مرضى حقيقية.</p><a href="/" class="sidebar-home">العودة للموقع <span aria-hidden="true">←</span></a></div>
+    </aside>
+
+    <main class="workspace-main">
+      <header class="dashboard-header">
+        <div><p class="overline">DARECARE / الإدارة</p><h1 id="pageTitle">نظرة عامة</h1><p class="page-subtitle" id="pageSubtitle">المتابعة المباشرة لحالة المنصة</p></div>
+        <div class="header-actions">
+          <span class="demo-label">بيئة تجريبية</span>
+          <span class="account-name" id="adminIdentity">مدير النظام</span>
+          <button type="button" id="refreshAdmin" class="outline-btn">تحديث <span aria-hidden="true">↻</span></button>
+          <button type="button" id="adminLogout" class="quiet-btn">خروج</button>
+        </div>
+      </header>
+
+      <p class="global-error" id="globalError" role="alert" hidden></p>
+      <div id="loadingStatus" class="loading-status" role="status" hidden>جارِ تحميل البيانات...</div>
+
+      <section id="view-overview" class="dashboard-view" aria-label="نظرة عامة">
+        <div class="section-intro"><div><p class="overline">ملخص المنصة</p><h2>أهم المؤشرات</h2><p>بيانات مباشرة من الـBackend، وليست أرقامًا ثابتة.</p></div><span class="updated-text" id="lastUpdated"></span></div>
+        <div class="metrics" id="metrics"><p class="empty">جارِ تحميل المؤشرات...</p></div>
+        <div class="panel-grid">
+          <section class="panel"><div class="panel-heading"><div><p class="overline">يحتاج تدخّلك</p><h3>طلبات التمريض</h3></div><button class="link-button" data-go="nurses" type="button">عرض الكل ←</button></div><div id="overviewNurses" class="rows"><p class="empty">جارِ التحميل...</p></div></section>
+          <section class="panel"><div class="panel-heading"><div><p class="overline">يحتاج مراجعة</p><h3>طلبات الصيدليات</h3></div><button class="link-button" data-go="pharmacies" type="button">عرض الكل ←</button></div><div id="overviewPharmacies" class="rows"><p class="empty">جارِ التحميل...</p></div></section>
+        </div>
+        <section class="panel full-panel"><div class="panel-heading"><div><p class="overline">الحالة التشغيلية</p><h3>حالة الحجوزات والطلبات</h3></div></div><div class="status-grid" id="statusBreakdown"><p class="empty">جارِ التحميل...</p></div></section>
+      </section>
+
+      <section id="view-nurses" class="dashboard-view" aria-label="طلبات التمريض" hidden>
+        <div class="section-intro"><div><p class="overline">الاعتمادات</p><h2>طلبات التمريض المعلّقة</h2><p>راجع الترخيص والمهارات قبل اعتماد أي ممرض. اعتماد الحساب في التجربة لا يعني التحقق من الترخيص الحقيقي.</p></div></div>
+        <div class="panel" id="nurseRequests"><p class="empty">جارِ التحميل...</p></div>
+      </section>
+
+      <section id="view-pharmacies" class="dashboard-view" aria-label="طلبات الصيدليات" hidden>
+        <div class="section-intro"><div><p class="overline">الاعتمادات</p><h2>الصيدليات في انتظار الاعتماد</h2><p>لا يمكن الاعتماد إلا بعد استكمال دعوة الحساب. يتطلب ذلك مراجعة بشرية.</p></div></div>
+        <div class="panel" id="pharmacyRequests"><p class="empty">جارِ التحميل...</p></div>
+      </section>
+
+      <section id="view-users" class="dashboard-view" aria-label="إدارة المستخدمين" hidden>
+        <div class="section-intro"><div><p class="overline">الحسابات</p><h2>المستخدمون</h2><p>عرض آخر 50 حسابًا في الصفحة. الإدارة لا تسمح بإيقاف حسابات Admin من هنا.</p></div></div>
+        <div class="panel"><div id="usersList"><p class="empty">جارِ التحميل...</p></div><div class="pagination"><button type="button" id="usersPrev" class="outline-btn" disabled>السابق</button><span id="usersPage">صفحة 1</span><button type="button" id="usersNext" class="outline-btn">التالي</button></div></div>
+      </section>
+
+      <section id="view-audit" class="dashboard-view" aria-label="سجل الإجراءات" hidden>
+        <div class="section-intro"><div><p class="overline">التتبّع</p><h2>سجل الإجراءات</h2><p>قراءة آخر الإجراءات الإدارية المسجلة في النظام.</p></div></div>
+        <div class="panel"><div id="auditList"><p class="empty">جارِ التحميل...</p></div><div class="pagination"><button type="button" id="auditPrev" class="outline-btn" disabled>السابق</button><span id="auditPage">صفحة 1</span><button type="button" id="auditNext" class="outline-btn">التالي</button></div></div>
+      </section>
+
+      <footer class="workspace-footer">DARECARE · لوحة إدارة تجريبية · جميع الصلاحيات تُفرض من الـAPI.</footer>
+    </main>
+  </div>
+
+  <div class="toast" id="adminToast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

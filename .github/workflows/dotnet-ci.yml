@@ -21,6 +21,8 @@ jobs:
       - run: dotnet test DareCare.slnx --no-build --configuration Release
       - name: Validate DareCare Lite JavaScript syntax
         run: node --check src/DareCare.Api/wwwroot/darecare-lite.js
+      - name: Validate Admin portal JavaScript syntax
+        run: node --check src/DareCare.Api/wwwroot/darecare-admin.js
   render-free-container-smoke:
     # Test the exact Render Docker image before merging into the demo branch too.
     if: github.ref == 'refs/heads/darecare-demo-free' || (github.event_name == 'pull_request' && github.base_ref == 'darecare-demo-free')
@@ -59,6 +61,24 @@ jobs:
               curl --silent --show-error --fail \
                 http://127.0.0.1:18080/assets/darecare-lite.js > /tmp/darecare-lite.js
               grep -q 'DareCare Lite' /tmp/darecare-lite.js
+              # A real admin alias is served by the same API, not an external frontend.
+              curl --silent --show-error --fail --dump-header /tmp/darecare-admin-headers.txt \
+                http://127.0.0.1:18080/admin > /tmp/darecare-admin.html
+              grep -q 'id="adminLoginForm"' /tmp/darecare-admin.html
+              grep -q 'darecare-admin.js' /tmp/darecare-admin.html
+              grep -qi 'cache-control: no-store' /tmp/darecare-admin-headers.txt
+              grep -qi 'content-security-policy:' /tmp/darecare-admin-headers.txt
+              grep -qi 'x-robots-tag: noindex' /tmp/darecare-admin-headers.txt
+              curl --silent --show-error --fail http://127.0.0.1:18080/admin/login > /tmp/darecare-admin-alias.html
+              grep -q 'id="adminLoginForm"' /tmp/darecare-admin-alias.html
+              curl --silent --show-error --fail \
+                http://127.0.0.1:18080/assets/darecare-admin.css > /tmp/darecare-admin.css
+              grep -q 'workspace' /tmp/darecare-admin.css
+              curl --silent --show-error --fail \
+                http://127.0.0.1:18080/assets/darecare-admin.js > /tmp/darecare-admin.js
+              grep -q 'roles.includes' /tmp/darecare-admin.js
+              test "$(curl --silent --output /dev/null --write-out '%{http_code}' \
+                http://127.0.0.1:18080/api/v1/admin/overview)" = 401
               # The Development-only auth lab must remain inaccessible in Staging.
               test "$(curl --silent --output /dev/null --write-out '%{http_code}' \
                 http://127.0.0.1:18080/auth.html)" = 404
@@ -83,6 +103,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify existing Render domain serves UI and API without writing data
         run: python3 scripts/verify_lite_site.py --attempts 15 --interval 20
+      - name: Verify new admin alias on the public Render service (GET-only)
+        run: python3 scripts/verify_admin_live.py
   browser-lite-onboarding:
     # Browser DOM interactions are mocked; live backend writes remain loopback Docker only.
     if: github.event_name == 'pull_request'
@@ -99,3 +121,13 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Browser nurse/admin/patient actions and mobile overflow
         run: python scripts/ci_lite_browser.py
+      - name: Admin alias role guard, dashboard actions and 390px browser QA
+        run: python scripts/ci_admin_browser.py
+      - name: Upload synthetic admin browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-portal-playwright
+          path: artifacts/admin-*.png
+          if-no-files-found: ignore
+          retention-days: 7
