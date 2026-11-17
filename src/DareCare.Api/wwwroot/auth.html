@@ -66,6 +66,11 @@
         <div class="nurse-only hidden"><label for="experience">سنوات الخبرة</label><input id="experience" type="number" min="0" max="60" value="0"></div>
         <div class="actions"><button type="submit" id="submitText">تسجيل الدخول</button></div>
       </form>
+      <form id="factorLoginForm" class="hidden">
+        <label for="factorLoginCode">كود تطبيق Authenticator أو كود الاسترداد</label>
+        <input id="factorLoginCode" dir="ltr" maxlength="20" autocomplete="one-time-code" required>
+        <div class="actions"><button type="submit">تأكيد الكود</button></div>
+      </form>
       <div id="recoveryBox" class="hidden">
         <div class="space"></div><h2>الإيميل والأكواد</h2>
         <p>تحتاج SMTP (مثل Mailpit) لإرسال كود إعادة كلمة السر أو تأكيد البريد.</p>
@@ -195,6 +200,7 @@
   <script>
   'use strict';
   let tab = 'login';
+  let challengeToken = '';
   let accessToken = '';
   let refreshToken = '';
   let currentRoles = [];
@@ -204,6 +210,9 @@
   const show = (selector, visible) => document.querySelectorAll(selector).forEach(node => node.classList.toggle('hidden', !visible));
   function selectTab(next) {
     tab = next;
+    challengeToken = '';
+    $('factorLoginForm').reset();
+    $('factorLoginForm').classList.add('hidden');
     document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === next));
     show('.new-only', tab === 'patient' || tab === 'nurse');
     show('.nurse-only', tab === 'nurse');
@@ -248,9 +257,27 @@
     if (tab === 'nurse') Object.assign(input, { licenseNumber: value('license'), yearsOfExperience: Number(value('experience')) });
     try {
       const res = await request(path, 'POST', input, false);
+      if (res.body?.twoFactorRequired) {
+        challengeToken = res.body.challengeToken;
+        $('password').value = '';
+        $('authForm').classList.add('hidden');
+        $('factorLoginForm').classList.remove('hidden');
+        $('factorLoginCode').focus();
+        $('status').textContent = 'أدخل كود التحقق لإكمال تسجيل الدخول';
+        return;
+      }
       if (res.body?.accessToken) retainSession(res.body);
       log(path + ' — HTTP ' + res.status, { ...res.body, accessToken: res.body?.accessToken ? '[REDACTED]' : undefined, refreshToken: res.body?.refreshToken ? '[REDACTED]' : undefined });
     } catch (err) { log('Request failed', err); }
+  });
+  $('factorLoginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    try {
+      const res = await request('/api/v1/auth/authenticator/login', 'POST',
+        { challengeToken, code: value('factorLoginCode') }, false);
+      selectTab('login');
+      retainSession(res.body);
+    } catch (err) { log('Authenticator sign-in failed', err); }
   });
   document.querySelectorAll('[data-action]').forEach(button => button.addEventListener('click', async () => {
     const action = button.dataset.action;

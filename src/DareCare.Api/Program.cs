@@ -7,6 +7,7 @@ using DareCare.Api.Services;
 using DareCare.Infrastructure.Identity;
 using DareCare.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -61,6 +62,14 @@ if (builder.Configuration.GetValue<int>("Auth:RefreshTokenDays", 14) is < 1 or >
 builder.Configuration["Auth:RequireConfirmedEmail"] ??= builder.Environment.IsDevelopment() ? "false" : "true";
 var requireEmailConfirmation = builder.Configuration.GetValue<bool>("Auth:RequireConfirmedEmail");
 
+var keyDirectory = builder.Configuration["Auth:DataProtectionKeyDirectory"];
+if (!string.IsNullOrWhiteSpace(keyDirectory))
+{
+    if (!Path.IsPathFullyQualified(keyDirectory))
+        throw new InvalidOperationException("Auth:DataProtectionKeyDirectory must be an absolute path.");
+    builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(keyDirectory));
+}
+
 builder.Services.AddDbContext<DareCareDbContext>(options =>
 {
     if (useSqlite) options.UseSqlite(connectionString);
@@ -84,6 +93,12 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<JwtTokenService>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<AuthStateStore>();
+builder.Services.AddScoped<EmailOtpService>();
+builder.Services.AddScoped<AuthenticatorService>();
+builder.Services.AddScoped<GoogleAccountService>();
+builder.Services.AddSingleton<IGoogleIdentityVerifier, GoogleIdentityVerifier>();
 builder.Services.AddScoped<IPrivatePrescriptionStorage, PrivatePrescriptionStorage>();
 builder.Services.AddSingleton<DevelopmentEmailOutbox>();
 builder.Services.AddScoped<IAccountEmailService, AccountEmailService>();
@@ -185,9 +200,15 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
         ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
         ctx.Response.Headers["X-Frame-Options"] = "DENY";
         ctx.Response.Headers["Referrer-Policy"] = "no-referrer";
+        var googleEnabled = !string.IsNullOrWhiteSpace(app.Configuration["Auth:Google:WebClientId"]);
+        if (googleEnabled)
+            ctx.Response.Headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups";
         ctx.Response.Headers["Content-Security-Policy"] =
             "default-src 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; " +
-            "form-action 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'";
+            "form-action 'self'; img-src 'self'; " + (googleEnabled
+                ? "connect-src 'self' https://accounts.google.com/gsi/; style-src 'self' https://accounts.google.com/gsi/style; " +
+                  "script-src 'self' https://accounts.google.com/gsi/client; frame-src https://accounts.google.com/gsi/"
+                : "connect-src 'self'; style-src 'self'; script-src 'self'");
         return Results.File(Path.Combine(liteRoot, "darecare-lite.html"), "text/html; charset=utf-8");
     }).WithName("DareCareLiteHome");
 

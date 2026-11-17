@@ -55,14 +55,20 @@ export function createDareCareClient(baseUrl, onSessionExpired = () => {}) {
     else if (response.status === 401 && accessToken) { clearSession(); onSessionExpired(); }
     return parse(response);
   }
-  async function login(email, password) {
-    const result = await request('/api/v1/auth/login', {method:'POST', body:{email,password}});
+  async function signIn(path, body) {
+    const result = await parse(await fetch(`${root}/api/v1/auth/${path}`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, cache:'no-store', body:JSON.stringify(body)
+    }));
+    if (result?.twoFactorRequired && result.challengeToken) return result;
     setSession(result);
     return {userId:result.userId, roles:result.roles, expiresAtUtc:result.expiresAtUtc};
   }
+  const login = (email, password) => signIn('login', {email,password});
+  const loginWithGoogle = idToken => signIn('google', {idToken});
+  const completeAuthenticatorLogin = (challengeToken, code) => signIn('authenticator/login', {challengeToken,code});
   async function logout() {
     try { if (accessToken && refreshToken) await request('/api/v1/auth/logout', {method:'POST', body:{refreshToken}}); }
     finally { clearSession(); }
   }
-  return {request, login, logout, clearSession, isSignedIn:()=>!!accessToken};
+  return {request, login, loginWithGoogle, completeAuthenticatorLogin, logout, clearSession, isSignedIn:()=>!!accessToken};
 }

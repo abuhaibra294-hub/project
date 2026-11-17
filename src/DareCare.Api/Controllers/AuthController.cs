@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace DareCare.Api.Controllers;
@@ -24,6 +23,10 @@ public sealed class AuthController(
     DareCareDbContext db,
     JwtTokenService tokens,
     IAccountEmailService emails,
+    EmailOtpService otp,
+    AuthenticatorService authenticator,
+    IGoogleIdentityVerifier google,
+    GoogleAccountService googleAccounts,
     IConfiguration config,
     ILogger<AuthController> logger) : ControllerBase
 {
@@ -47,7 +50,7 @@ public sealed class AuthController(
             await db.SaveChangesAsync(ct);
             await tx.CommitAsync(ct);
         }
-        await SendVerificationIfConfiguredAsync(user, ct);
+        await SendVerificationIfConfiguredAsync(user, input.UseEmailOtp, ct);
         return RequireEmailConfirmation
             ? Accepted(new { message = "Check your email to verify your account before signing in." })
             : Ok(await tokens.IssueAsync(user, ct));
@@ -81,7 +84,7 @@ public sealed class AuthController(
             }
             await tx.CommitAsync(ct);
         }
-        await SendVerificationIfConfiguredAsync(user, ct);
+        await SendVerificationIfConfiguredAsync(user, input.UseEmailOtp, ct);
         return RequireEmailConfirmation
             ? Accepted(new { message = "Verify your email. Your nursing license must also be approved before receiving bookings." })
             : Ok(await tokens.IssueAsync(user, ct));
@@ -90,6 +93,8 @@ public sealed class AuthController(
     [HttpPost("login")]
     [AllowAnonymous]
     [EnableRateLimiting("auth")]
+    [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<AuthenticatorChallengeResponse>(StatusCodes.Status202Accepted)]
     public async Task<IActionResult> Login([FromBody] LoginRequest input, CancellationToken ct)
     {
         var user = await userManager.FindByEmailAsync(input.Email.Trim());
@@ -98,9 +103,51 @@ public sealed class AuthController(
 
         var signIn = await signInManager.CheckPasswordSignInAsync(user, input.Password, lockoutOnFailure: true);
         if (!signIn.Succeeded) return Unauthorized(new { message = "Invalid credentials." });
-        if (RequireEmailConfirmation && !user.EmailConfirmed)
-            return StatusCode(StatusCodes.Status403Forbidden, new { message = "Confirm your email before signing in." });
-        return Ok(await tokens.IssueAsync(user, ct));
+        return await CompleteFirstFactorAsync(user, ct);
+    }
+
+    [HttpGet("google/config")]
+    [AllowAnonymous]
+    [ProducesResponseType<GoogleSignInConfigResponse>(StatusCodes.Status200OK)]
+    public IActionResult GoogleConfig() => Ok(new GoogleSignInConfigResponse(google.WebClientId));
+
+    [HttpPost("google")]
+    [AllowAnonymous]
+    [EnableRateLimiting("auth")]
+    [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<AuthenticatorChallengeResponse>(StatusCodes.Status202Accepted)]
+    public async Task<IActionResult> GoogleSignIn([FromBody] GoogleSignInRequest input, CancellationToken ct)
+    {
+        if (!google.IsConfigured)
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new { message = "Google sign-in is not configured." });
+        var identity = await google.VerifyAsync(input.IdToken);
+        if (identity is null) return Unauthorized(new { message = "Invalid Google credential." });
+
+        var (user, linkRequired) = await googleAccounts.FindOrCreatePatientAsync(identity, ct);
+        if (linkRequired)
+            return Conflict(new { code = "google_link_required", message = "Sign in to your DareCare account and link Google from account security." });
+        if (user is not { IsActive: true, IsPendingInvitation: false } ||
+            !await googleAccounts.IsPatientAsync(user) || await userManager.IsLockedOutAsync(user))
+            return Unauthorized(new { message = "Google sign-in is unavailable for this account." });
+        return await CompleteFirstFactorAsync(user, ct);
+    }
+
+    [HttpPost("google/link")]
+    [Authorize(Roles = AppRoles.Patient)]
+    [EnableRateLimiting("auth")]
+    public async Task<IActionResult> LinkGoogle([FromBody] GoogleLinkRequest input)
+    {
+        if (!google.IsConfigured)
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new { message = "Google sign-in is not configured." });
+        var user = await userManager.FindByIdAsync(User.CurrentUserId().ToString());
+        if (user is not { IsActive: true, IsPendingInvitation: false } ||
+            !(await signInManager.CheckPasswordSignInAsync(user, input.CurrentPassword, lockoutOnFailure: true)).Succeeded)
+            return Unauthorized(new { message = "Invalid credentials." });
+        var identity = await google.VerifyAsync(input.IdToken);
+        if (identity is null) return Unauthorized(new { message = "Invalid Google credential." });
+        return await googleAccounts.LinkAsync(user, identity)
+            ? NoContent()
+            : Conflict(new { message = "Use a Google account with the same verified email address." });
     }
 
     [HttpPost("refresh")]
@@ -162,7 +209,7 @@ public sealed class AuthController(
         var id = User.CurrentUserId();
         var user = await db.Users.AsNoTracking().Where(x => x.Id == id)
             .Select(x => new { x.Id, x.Email, x.FullName, x.PhoneNumber,
-                x.EmailConfirmed, x.RegisteredAtUtc, x.IsActive }).SingleOrDefaultAsync(ct);
+                x.EmailConfirmed, x.RegisteredAtUtc, x.IsActive, x.TwoFactorEnabled }).SingleOrDefaultAsync(ct);
         if (user is null) return Unauthorized();
         var roles = await userManager.GetRolesAsync((await userManager.FindByIdAsync(id.ToString()))!);
         var nurseApproved = roles.Contains(AppRoles.Nurse)
@@ -170,7 +217,7 @@ public sealed class AuthController(
         var pharmacyApproved = roles.Contains(AppRoles.Pharmacy)
             ? await db.Pharmacies.Where(p => p.UserId == id).Select(p => (bool?)p.IsApproved).FirstOrDefaultAsync(ct) : null;
         return Ok(new { user.Id, user.Email, user.FullName, user.PhoneNumber,
-            user.EmailConfirmed, user.RegisteredAtUtc, user.IsActive, roles,
+            user.EmailConfirmed, user.RegisteredAtUtc, user.IsActive, user.TwoFactorEnabled, roles,
             nurseApproved, pharmacyApproved });
     }
 
@@ -195,24 +242,41 @@ public sealed class AuthController(
         if (!emails.IsConfigured) return EmailUnavailable();
         var user = await userManager.FindByEmailAsync(input.Email.Trim());
         if (user is { IsActive: true, EmailConfirmed: false, IsPendingInvitation: false })
-            await TrySendAsync(() => emails.SendVerificationAsync(user, ct), user.Id);
+            await SendVerificationIfConfiguredAsync(user, input.UseEmailOtp, ct);
         return Accepted(new { message = "If this account needs verification, an email will be sent." });
     }
 
     [HttpPost("verify-email")]
     [AllowAnonymous]
     [EnableRateLimiting("auth")]
-    public async Task<IActionResult> VerifyEmail([FromBody] EmailTokenRequest input)
+    public async Task<IActionResult> VerifyEmail([FromBody] EmailTokenRequest input, CancellationToken ct)
     {
-        if (!TryDecodeCode(input.Code, out var code))
+        var supplied = input.Code.Trim();
+        var useOtp = EmailOtpService.IsCode(supplied);
+        var code = "";
+        if (!useOtp && !TryDecodeCode(supplied, out code))
             return BadRequest(new { message = "Invalid verification code." });
         var user = await userManager.FindByEmailAsync(input.Email.Trim());
-        if (user is null || user.IsPendingInvitation)
+        if (user is not { IsActive: true, IsPendingInvitation: false })
             return BadRequest(new { message = "Invalid verification code." });
-        if (user.EmailConfirmed) return Ok(new { message = "Email is already verified." });
+        if (user.EmailConfirmed) return useOtp
+            ? BadRequest(new { message = "Invalid or expired verification code." })
+            : Ok(new { message = "Email is already verified." });
+
+        await using var tx = useOtp ? await db.Database.BeginTransactionAsync(ct) : null;
+        if (useOtp)
+        {
+            if (!await otp.TryConsumeAsync(user, EmailOtpPurpose.VerifyEmail, supplied, ct))
+            {
+                await tx!.CommitAsync(ct); // Keep any failed attempt recorded by the OTP service.
+                return BadRequest(new { message = "Invalid or expired verification code." });
+            }
+            code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        }
         var result = await userManager.ConfirmEmailAsync(user, code);
-        return result.Succeeded ? Ok(new { message = "Email verified. You can now sign in." })
-            : BadRequest(new { message = "Invalid or expired verification code." });
+        if (!result.Succeeded) return BadRequest(new { message = "Invalid or expired verification code." });
+        if (tx is not null) await tx.CommitAsync(ct);
+        return Ok(new { message = "Email verified. You can now sign in." });
     }
 
     [HttpPost("forgot-password")]
@@ -223,7 +287,9 @@ public sealed class AuthController(
         if (!emails.IsConfigured) return EmailUnavailable();
         var user = await userManager.FindByEmailAsync(input.Email.Trim());
         if (user is not null && (user.IsActive || user.IsPendingInvitation))
-            await TrySendAsync(() => emails.SendPasswordResetAsync(user, ct), user.Id);
+            await TrySendAsync(() => input.UseEmailOtp
+                ? otp.SendAsync(user, EmailOtpPurpose.ResetPassword, ct)
+                : emails.SendPasswordResetAsync(user, ct), user.Id);
         return Accepted(new { message = "If the account exists, password reset instructions will be emailed." });
     }
 
@@ -232,12 +298,25 @@ public sealed class AuthController(
     [EnableRateLimiting("auth")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest input, CancellationToken ct)
     {
-        if (!TryDecodeCode(input.Code, out var code)) return BadRequest(new { message = "Invalid or expired reset code." });
+        var supplied = input.Code.Trim();
+        var useOtp = EmailOtpService.IsCode(supplied);
+        var code = "";
+        if (!useOtp && !TryDecodeCode(supplied, out code))
+            return BadRequest(new { message = "Invalid or expired reset code." });
         var user = await userManager.FindByEmailAsync(input.Email.Trim());
         if (user is null || (!user.IsActive && !user.IsPendingInvitation))
             return BadRequest(new { message = "Invalid or expired reset code." });
 
         await using var tx = await db.Database.BeginTransactionAsync(ct);
+        if (useOtp)
+        {
+            if (!await otp.TryConsumeAsync(user, EmailOtpPurpose.ResetPassword, supplied, ct))
+            {
+                await tx.CommitAsync(ct);
+                return BadRequest(new { message = "Invalid or expired reset code." });
+            }
+            code = await userManager.GeneratePasswordResetTokenAsync(user);
+        }
         var result = await userManager.ResetPasswordAsync(user, code, input.NewPassword);
         if (!result.Succeeded) return BadRequest(new { message = "Invalid reset code or password does not meet the policy." });
         if (user.IsPendingInvitation)
@@ -263,9 +342,23 @@ public sealed class AuthController(
         PhoneNumber = phone.Trim()
     };
 
-    private async Task SendVerificationIfConfiguredAsync(ApplicationUser user, CancellationToken ct)
+    private async Task<IActionResult> CompleteFirstFactorAsync(ApplicationUser user, CancellationToken ct)
     {
-        if (emails.IsConfigured) await TrySendAsync(() => emails.SendVerificationAsync(user, ct), user.Id);
+        if (RequireEmailConfirmation && !user.EmailConfirmed)
+            return StatusCode(StatusCodes.Status403Forbidden, new { message = "Confirm your email before signing in." });
+        if (!user.TwoFactorEnabled) return Ok(await tokens.IssueAsync(user, ct));
+        var challenge = await authenticator.StartLoginAsync(user, ct);
+        return challenge is null
+            ? Conflict(new { message = "Another sign-in is in progress. Please try again." })
+            : Accepted(challenge);
+    }
+
+    private async Task SendVerificationIfConfiguredAsync(ApplicationUser user, bool useOtp, CancellationToken ct)
+    {
+        if (emails.IsConfigured)
+            await TrySendAsync(() => useOtp
+                ? otp.SendAsync(user, EmailOtpPurpose.VerifyEmail, ct)
+                : emails.SendVerificationAsync(user, ct), user.Id);
     }
 
     private async Task TrySendAsync(Func<Task> send, Guid userId)

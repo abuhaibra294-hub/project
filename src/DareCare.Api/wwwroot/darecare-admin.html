@@ -35,12 +35,19 @@
         <h2>أهلًا برجوعك</h2>
         <p class="lead">سجّل دخولك بحساب يحمل صلاحية <b>Admin</b> للوصول للوحة التحكم.</p>
         <form id="adminLoginForm">
+          <div id="adminCredentials">
           <label for="adminEmail">البريد الإلكتروني للإدارة</label>
           <input id="adminEmail" name="email" type="email" inputmode="email" autocomplete="username" placeholder="admin@example.com" required>
           <label for="adminPassword">كلمة المرور</label>
           <div class="password-wrap">
             <input id="adminPassword" name="password" type="password" autocomplete="current-password" placeholder="أدخل كلمة المرور" required>
             <button type="button" id="togglePassword" class="password-toggle" aria-label="إظهار كلمة المرور" aria-pressed="false">إظهار</button>
+          </div>
+          </div>
+          <div id="adminFactor" hidden>
+            <label for="adminFactorCode">كود تطبيق Authenticator أو كود الاسترداد</label>
+            <input id="adminFactorCode" dir="ltr" maxlength="20" autocomplete="one-time-code">
+            <button type="button" id="adminFactorBack" class="outline-btn">رجوع</button>
           </div>
           <p id="loginError" class="form-error" role="alert" hidden></p>
           <button id="loginSubmit" type="submit" class="primary-btn">دخول لوحة الإدارة <span aria-hidden="true">←</span></button>

@@ -5,6 +5,8 @@
   <ItemGroup>
     <ProjectReference Include="../DareCare.Application/DareCare.Application.csproj" />
     <ProjectReference Include="../DareCare.Infrastructure/DareCare.Infrastructure.csproj" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.78.0" />
+    <PackageReference Include="Otp.NET" Version="1.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">

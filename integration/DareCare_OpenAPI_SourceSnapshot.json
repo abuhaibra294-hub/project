@@ -483,6 +483,157 @@
         }
       }
     },
+    "/api/v1/auth/authenticator/disable": {
+      "post": {
+        "tags": [
+          "Authenticator"
+        ],
+        "summary": "Authenticator: Disable",
+        "operationId": "Authenticator_Disable",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticatorCodeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/authenticator/enable": {
+      "post": {
+        "tags": [
+          "Authenticator"
+        ],
+        "summary": "Authenticator: Enable",
+        "operationId": "Authenticator_Enable",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticatorCodeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/authenticator/login": {
+      "post": {
+        "tags": [
+          "Authenticator"
+        ],
+        "summary": "Authenticator: CompleteAuthenticatorLogin",
+        "operationId": "Authenticator_CompleteAuthenticatorLogin",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticatorLoginRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/authenticator/setup": {
+      "post": {
+        "tags": [
+          "Authenticator"
+        ],
+        "summary": "Authenticator: Setup",
+        "operationId": "Authenticator_Setup",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Requires bearer token.",
+        "x-darecare-roles": [
+          "Authenticated"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
     "/api/v1/auth/change-password": {
       "post": {
         "tags": [
@@ -552,6 +703,103 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/google": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: GoogleSignIn",
+        "operationId": "Auth_GoogleSignIn",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleSignInRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/google/config": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: GoogleConfig",
+        "operationId": "Auth_GoogleConfig",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Public endpoint.",
+        "x-darecare-roles": [
+          "Public"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          }
+        }
+      }
+    },
+    "/api/v1/auth/google/link": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Auth: LinkGoogle",
+        "operationId": "Auth_LinkGoogle",
+        "description": "Source-derived operation listing. Export /openapi/v1.json from running API for framework-authoritative schema. Allowed roles: Patient.",
+        "x-darecare-roles": [
+          "Patient"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success. HTTP status and response shape depend on controller branch."
+          },
+          "400": {
+            "description": "Malformed request / validation error."
+          },
+          "401": {
+            "description": "Missing / expired access token."
+          },
+          "403": {
+            "description": "Insufficient role or object-level permission."
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleLinkRequest"
               }
             }
           }
@@ -3911,208 +4159,6 @@
           "Closed"
         ]
       },
-      "SavePatientAddressRequest": {
-        "type": "object",
-        "properties": {
-          "label": {
-            "type": "string",
-            "maxLength": 50
-          },
-          "city": {
-            "type": "string",
-            "maxLength": 120
-          },
-          "fullAddress": {
-            "type": "string",
-            "maxLength": 250
-          },
-          "notes": {
-            "type": "string",
-            "maxLength": 300,
-            "nullable": true
-          },
-          "isDefault": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "label",
-          "city",
-          "fullAddress"
-        ]
-      },
-      "CreateSupportTicketRequest": {
-        "type": "object",
-        "properties": {
-          "subject": {
-            "type": "string",
-            "maxLength": 160
-          },
-          "category": {
-            "$ref": "#/components/schemas/SupportTicketCategory"
-          },
-          "message": {
-            "type": "string",
-            "maxLength": 4000
-          }
-        },
-        "required": [
-          "subject",
-          "message"
-        ]
-      },
-      "ReplySupportTicketRequest": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "maxLength": 4000
-          }
-        },
-        "required": [
-          "message"
-        ]
-      },
-      "UpdateSupportStatusRequest": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "$ref": "#/components/schemas/SupportTicketStatus",
-            "nullable": true
-          }
-        },
-        "required": [
-          "status"
-        ]
-      },
-      "PatientAddressResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "label": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string"
-          },
-          "fullAddress": {
-            "type": "string"
-          },
-          "notes": {
-            "type": "string"
-          },
-          "isDefault": {
-            "type": "boolean"
-          },
-          "createdAtUtc": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "id",
-          "label",
-          "city",
-          "fullAddress",
-          "isDefault",
-          "createdAtUtc"
-        ]
-      },
-      "CreateBookingRequest": {
-        "type": "object",
-        "properties": {
-          "nurseProfileId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "availabilitySlotId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "careServiceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "addressId": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "serviceAddress": {
-            "type": "string",
-            "maxLength": 400,
-            "nullable": true
-          }
-        }
-      },
-      "SetApprovalRequest": {
-        "type": "object",
-        "properties": {
-          "approved": {
-            "type": "boolean",
-            "nullable": true
-          }
-        },
-        "required": [
-          "approved"
-        ]
-      },
-      "BookingResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "patientUserId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "nurseProfileId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "availabilitySlotId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "serviceName": {
-            "type": "string"
-          },
-          "startsAtUtc": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endsAtUtc": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "serviceAddress": {
-            "type": "string"
-          },
-          "priceAtBooking": {
-            "type": "number"
-          },
-          "status": {
-            "$ref": "#/components/schemas/BookingStatus"
-          }
-        },
-        "required": [
-          "id",
-          "patientUserId",
-          "nurseProfileId",
-          "availabilitySlotId",
-          "serviceName",
-          "startsAtUtc",
-          "endsAtUtc",
-          "serviceAddress",
-          "priceAtBooking",
-          "status"
-        ]
-      },
       "UpdateAccountRequest": {
         "type": "object",
         "properties": {
@@ -4189,6 +4235,9 @@
             "type": "string",
             "maxLength": 256,
             "format": "email"
+          },
+          "useEmailOtp": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -4312,86 +4361,6 @@
           "isActive"
         ]
       },
-      "CreateNurseReviewRequest": {
-        "type": "object",
-        "properties": {
-          "rating": {
-            "type": "integer"
-          },
-          "comment": {
-            "type": "string",
-            "maxLength": 1000,
-            "nullable": true
-          }
-        }
-      },
-      "QuotePrescriptionRequest": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "number"
-          },
-          "notes": {
-            "type": "string",
-            "maxLength": 1500,
-            "nullable": true
-          }
-        }
-      },
-      "UpdateNurseProfileRequest": {
-        "type": "object",
-        "properties": {
-          "bio": {
-            "type": "string",
-            "maxLength": 1500,
-            "nullable": true
-          },
-          "city": {
-            "type": "string",
-            "maxLength": 120,
-            "nullable": true
-          },
-          "serviceArea": {
-            "type": "string",
-            "maxLength": 250,
-            "nullable": true
-          },
-          "yearsOfExperience": {
-            "type": "integer"
-          },
-          "hourlyRate": {
-            "type": "number"
-          }
-        }
-      },
-      "SetNurseSkillsRequest": {
-        "type": "object",
-        "properties": {
-          "skillIds": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "required": [
-          "skillIds"
-        ]
-      },
-      "CreateAvailabilitySlotRequest": {
-        "type": "object",
-        "properties": {
-          "startsAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endsAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
       "RegisterPatientRequest": {
         "type": "object",
         "properties": {
@@ -4410,6 +4379,9 @@
           "phoneNumber": {
             "type": "string",
             "maxLength": 32
+          },
+          "useEmailOtp": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -4444,6 +4416,9 @@
           },
           "yearsOfExperience": {
             "type": "integer"
+          },
+          "useEmailOtp": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -4506,6 +4481,413 @@
           "roles",
           "refreshToken",
           "refreshTokenExpiresAtUtc"
+        ]
+      },
+      "CreateBookingRequest": {
+        "type": "object",
+        "properties": {
+          "nurseProfileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "availabilitySlotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "careServiceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "addressId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "serviceAddress": {
+            "type": "string",
+            "maxLength": 400,
+            "nullable": true
+          }
+        }
+      },
+      "SetApprovalRequest": {
+        "type": "object",
+        "properties": {
+          "approved": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "required": [
+          "approved"
+        ]
+      },
+      "BookingResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "patientUserId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nurseProfileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "availabilitySlotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceName": {
+            "type": "string"
+          },
+          "startsAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "serviceAddress": {
+            "type": "string"
+          },
+          "priceAtBooking": {
+            "type": "number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/BookingStatus"
+          }
+        },
+        "required": [
+          "id",
+          "patientUserId",
+          "nurseProfileId",
+          "availabilitySlotId",
+          "serviceName",
+          "startsAtUtc",
+          "endsAtUtc",
+          "serviceAddress",
+          "priceAtBooking",
+          "status"
+        ]
+      },
+      "UpdateNurseProfileRequest": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "maxLength": 1500,
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 120,
+            "nullable": true
+          },
+          "serviceArea": {
+            "type": "string",
+            "maxLength": 250,
+            "nullable": true
+          },
+          "yearsOfExperience": {
+            "type": "integer"
+          },
+          "hourlyRate": {
+            "type": "number"
+          }
+        }
+      },
+      "SetNurseSkillsRequest": {
+        "type": "object",
+        "properties": {
+          "skillIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "skillIds"
+        ]
+      },
+      "CreateAvailabilitySlotRequest": {
+        "type": "object",
+        "properties": {
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "QuotePrescriptionRequest": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 1500,
+            "nullable": true
+          }
+        }
+      },
+      "CreateNurseReviewRequest": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "integer"
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 1000,
+            "nullable": true
+          }
+        }
+      },
+      "GoogleSignInRequest": {
+        "type": "object",
+        "properties": {
+          "idToken": {
+            "type": "string",
+            "maxLength": 8192
+          }
+        },
+        "required": [
+          "idToken"
+        ]
+      },
+      "GoogleLinkRequest": {
+        "type": "object",
+        "properties": {
+          "idToken": {
+            "type": "string",
+            "maxLength": 8192
+          },
+          "currentPassword": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "idToken",
+          "currentPassword"
+        ]
+      },
+      "AuthenticatorCodeRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 32
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "AuthenticatorLoginRequest": {
+        "type": "object",
+        "properties": {
+          "challengeToken": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 32
+          }
+        },
+        "required": [
+          "challengeToken",
+          "code"
+        ]
+      },
+      "AuthenticatorChallengeResponse": {
+        "type": "object",
+        "properties": {
+          "twoFactorRequired": {
+            "type": "boolean"
+          },
+          "challengeToken": {
+            "type": "string"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "twoFactorRequired",
+          "challengeToken",
+          "expiresAtUtc"
+        ]
+      },
+      "AuthenticatorSetupResponse": {
+        "type": "object",
+        "properties": {
+          "sharedKey": {
+            "type": "string"
+          },
+          "authenticatorUri": {
+            "type": "string"
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "sharedKey",
+          "authenticatorUri",
+          "expiresAtUtc"
+        ]
+      },
+      "AuthenticatorEnabledResponse": {
+        "type": "object",
+        "properties": {
+          "recoveryCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "session": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "recoveryCodes",
+          "session"
+        ]
+      },
+      "GoogleSignInConfigResponse": {
+        "type": "object",
+        "properties": {
+          "webClientId": {
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "SavePatientAddressRequest": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "fullAddress": {
+            "type": "string",
+            "maxLength": 250
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 300,
+            "nullable": true
+          },
+          "isDefault": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "label",
+          "city",
+          "fullAddress"
+        ]
+      },
+      "CreateSupportTicketRequest": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "category": {
+            "$ref": "#/components/schemas/SupportTicketCategory"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "subject",
+          "message"
+        ]
+      },
+      "ReplySupportTicketRequest": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "UpdateSupportStatusRequest": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/SupportTicketStatus",
+            "nullable": true
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "PatientAddressResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "fullAddress": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "city",
+          "fullAddress",
+          "isDefault",
+          "createdAtUtc"
         ]
       },
       "UploadPrescriptionRequest": {
