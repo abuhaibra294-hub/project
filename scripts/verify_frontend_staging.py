@@ -49,10 +49,8 @@ def check(base, manifest_path, attempts, interval, timeout, origin=None):
     base = base.rstrip("/")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     expected = {(ep["path"], ep["method"].lower()) for ep in manifest["endpoints"]}
-    if len(expected) != manifest["count"]:
+    if not expected or len(expected) != manifest["count"]:
         raise ValueError("Local endpoint manifest is inconsistent.")
-    if len(expected) != 93:
-        raise ValueError(f"Expected 93 source endpoints but manifest has {len(expected)}.")
 
     last_error = None
     for n in range(1, attempts + 1):

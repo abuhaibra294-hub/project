@@ -18,8 +18,19 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Probe public API (GET/OPTIONS only, no credentials or writes)
+        env:
+          DARECARE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
+          manifest=integration/DareCare_API_Endpoints.json
+          if [ -n "$DARECARE_BASE_SHA" ]; then
+            # The public service stays on the base contract until the PR is released.
+            manifest="$(mktemp)"
+            git show "$DARECARE_BASE_SHA:integration/DareCare_API_Endpoints.json" > "$manifest"
+          fi
           python3 scripts/verify_frontend_staging.py \
             --base-url https://project-kv53.onrender.com \
+            --manifest "$manifest" \
             --attempts 4 --interval 20 --timeout 45
