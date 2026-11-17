@@ -28,11 +28,66 @@
   <section class="section section-soft" id="nurses"><div class="shell"><div class="section-heading"><div><span class="section-kicker">مقدمو الرعاية</span><h2>اختار الشخص المناسب</h2><p>بيظهر هنا بس فريق التمريض المعتمد والمتاح للبحث.</p></div><form id="searchNurses" class="searchbox" role="search"><label class="sr-only" for="citySearch">ابحث بالمدينة</label><input type="search" id="citySearch" placeholder="ابحث بالمدينة..." maxlength="120"><button type="submit" class="btn btn-solid btn-sm">بحث</button></form></div><div class="cards nurse-cards" id="nurseList" aria-live="polite"><p class="empty">جارِ تحميل التمريض...</p></div></div></section>
   <section class="shell section" id="bookingPanel" hidden><div class="booking-box"><div><span class="section-kicker">طلب زيارة</span><h2>كمّل تفاصيل الحجز</h2><p id="bookingIntro" class="muted">اختار خدمة وممرض أولًا.</p></div><form id="bookingForm" class="booking-form"><div class="field"><label for="slotSelect">الموعد المتاح</label><select id="slotSelect" required><option value="">اختر موعدًا</option></select></div><div class="field"><label for="visitAddress">عنوان الزيارة بالتفصيل</label><input id="visitAddress" required minlength="8" maxlength="400" placeholder="المدينة، الشارع، رقم العمارة والشقة" autocomplete="street-address"></div><button type="submit" class="btn btn-solid">تأكيد طلب الحجز</button></form><p class="fine">الزيارة تُرسل كطلب مبدئي، ويؤكدها الممرض من حسابه.</p></div></section>
   <section class="section shell" id="pharmacies"><div class="section-heading"><div><span class="section-kicker">خدمات الأدوية</span><h2>صيدليات شريكة</h2><p>اختار صيدلية معتمدة وارفع روشتة تجريبية من حساب المريض.</p></div></div><div class="cards pharmacy-cards" id="pharmacyList" aria-live="polite"><p class="empty">جارِ تحميل الصيدليات...</p></div><form id="rxForm" class="rx-form" hidden><div class="field"><label for="rxPharmacy">اختار الصيدلية</label><select id="rxPharmacy" required></select></div><div class="field"><label for="rxFile">ملف الروشتة (PDF أو صورة، حتى 8MB)</label><input type="file" id="rxFile" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" required></div><div class="field"><label for="rxNotes">ملاحظة اختيارية</label><input id="rxNotes" maxlength="1000" placeholder="أي ملاحظة للصيدلية"></div><button type="submit" class="btn btn-solid">رفع الروشتة</button><span class="fine">بيانات تجريبية فقط — ممنوع رفع روشتات أو بيانات مرضى حقيقية.</span></form></section>
-  <section class="section section-soft" id="dashboard" hidden><div class="shell"><div class="section-heading"><div><span class="section-kicker">مساحة حسابك</span><h2 id="dashboardTitle">حسابي</h2><p id="dashboardLead">بياناتك المباشرة من DareCare.</p></div><button class="btn btn-outline btn-sm" id="refreshDashboard" type="button">تحديث البيانات ↻</button></div><div class="stat-grid" id="stats"></div><div id="accountSections" class="account-sections" aria-live="polite"></div></div></section>
+  <section class="section section-soft" id="dashboard" hidden><div class="shell"><div class="section-heading"><div><span class="section-kicker">مساحة حسابك</span><h2 id="dashboardTitle">حسابي</h2><p id="dashboardLead">بياناتك المباشرة من DareCare.</p></div><button type="button" class="link-btn" id="securityButton">أمان الحساب</button><button class="btn btn-outline btn-sm" id="refreshDashboard" type="button">تحديث البيانات ↻</button></div><div class="stat-grid" id="stats"></div><div id="accountSections" class="account-sections" aria-live="polite"></div></div></section>
   <section class="closing shell"><div><span class="section-kicker">DARECARE</span><h2>رعاية بسيطة وقريبة.</h2><p>بنجرّب هنا الواجهة مع الباك إند الحقيقي قبل النسخة النهائية.</p></div><a href="#services" class="btn btn-solid">اختار خدمتك</a></section>
 </main>
 <footer><div class="shell footrow"><span>DARECARE <b>✚</b> — مشروع تخرج تجريبي</span><span>لا تستخدم بيانات طبية حقيقية على النسخة التجريبية.</span><a href="/admin" class="admin-entry" aria-label="دخول بوابة إدارة DareCare">دخول الإدارة</a></div></footer>
-<dialog id="authDialog" aria-labelledby="authTitle"><div class="modal-head"><div><span class="section-kicker">أهلاً بيك</span><h2 id="authTitle">الدخول إلى DareCare</h2></div><button type="button" class="icon-btn" id="closeAuth" aria-label="إغلاق">×</button></div><div class="mode-tabs"><button class="active" id="loginMode" type="button">تسجيل الدخول</button><button id="registerMode" type="button">حساب مريض</button><button id="nurseMode" type="button">حساب ممرض</button></div><form id="authForm"><div class="field" id="nameField" hidden><label for="fullName">الاسم بالكامل</label><input id="fullName" autocomplete="name" minlength="2" maxlength="160"></div><div class="field"><label for="email">البريد الإلكتروني</label><input type="email" id="email" autocomplete="email" required></div><div class="field" id="phoneField" hidden><label for="phone">رقم الهاتف</label><input type="tel" id="phone" autocomplete="tel" maxlength="32"></div><div class="field" id="licenseField" hidden><label for="licenseNumber">رقم الترخيص المهني (للتجربة: قيمة غير حقيقية)</label><input id="licenseNumber" minlength="3" maxlength="80" autocomplete="off"></div><div class="field" id="yearsField" hidden><label for="nurseYears">سنوات الخبرة</label><input type="number" id="nurseYears" min="0" max="60" step="1" value="0"></div><div class="field"><label for="password">كلمة المرور</label><input type="password" id="password" autocomplete="current-password" required></div><p class="fine" id="passwordTip" hidden>استخدم 12 حرفًا على الأقل، وأحرف كبيرة وصغيرة ورقمًا ورمزًا خاصًا. حساب الممرض يحتاج اختيار مهارات واعتماد الإدارة قبل استقبال الحجوزات.</p><button type="submit" class="btn btn-solid btn-wide" id="authSubmit">دخول</button></form><p class="fine">تجربة فحسب: الجلسة لا تُحفظ في المتصفح، وستحتاج تسجيل الدخول بعد تحديث الصفحة.</p></dialog>
+<dialog id="authDialog" aria-labelledby="authTitle"><div class="modal-head"><div><span class="section-kicker">أهلاً بيك</span><h2 id="authTitle">الدخول إلى DareCare</h2></div><button type="button" class="icon-btn" id="closeAuth" aria-label="إغلاق">×</button></div><div class="mode-tabs" id="authModes"><button class="active" id="loginMode" type="button">تسجيل الدخول</button><button id="registerMode" type="button">حساب مريض</button><button id="nurseMode" type="button">حساب ممرض</button></div><form id="authForm"><div class="field" id="nameField" hidden><label for="fullName">الاسم بالكامل</label><input id="fullName" autocomplete="name" minlength="2" maxlength="160"></div><div class="field"><label for="email">البريد الإلكتروني</label><input type="email" id="email" autocomplete="email" required></div><div class="field" id="phoneField" hidden><label for="phone">رقم الهاتف</label><input type="tel" id="phone" autocomplete="tel" maxlength="32"></div><div class="field" id="licenseField" hidden><label for="licenseNumber">رقم الترخيص المهني (للتجربة: قيمة غير حقيقية)</label><input id="licenseNumber" minlength="3" maxlength="80" autocomplete="off"></div><div class="field" id="yearsField" hidden><label for="nurseYears">سنوات الخبرة</label><input type="number" id="nurseYears" min="0" max="60" step="1" value="0"></div><div class="field"><label for="password">كلمة المرور</label><input type="password" id="password" autocomplete="current-password" required></div><p class="fine" id="passwordTip" hidden>استخدم 12 حرفًا على الأقل، وأحرف كبيرة وصغيرة ورقمًا ورمزًا خاصًا. حساب الممرض يحتاج اختيار مهارات واعتماد الإدارة قبل استقبال الحجوزات.</p><button type="submit" class="btn btn-solid btn-wide" id="authSubmit">دخول</button></form><div id="authAlternatives">
+  <div id="googleSignIn" class="google-slot" hidden></div>
+  <div class="auth-links">
+    <button class="link-btn" type="button" id="openVerifyEmail">تأكيد البريد</button>
+    <button class="link-btn" type="button" id="openResetPassword">نسيت كلمة المرور؟</button>
+  </div>
+</div>
+<form id="authCodeForm" hidden>
+  <p class="fine" id="authCodeHint"></p>
+  <div class="field" id="codeEmailField" hidden>
+    <label for="codeEmail">البريد الإلكتروني</label>
+    <input type="email" id="codeEmail" autocomplete="email" maxlength="256">
+  </div>
+  <div class="field">
+    <label for="authCode">الكود</label>
+    <input id="authCode" dir="ltr" autocomplete="one-time-code" maxlength="20" required>
+  </div>
+  <div class="field" id="resetPasswordField" hidden>
+    <label for="newAuthPassword">كلمة المرور الجديدة</label>
+    <input type="password" id="newAuthPassword" autocomplete="new-password" minlength="12" maxlength="128">
+  </div>
+  <button type="submit" class="btn btn-solid btn-wide" id="confirmAuthCode">تأكيد الكود</button>
+  <div class="auth-links">
+    <button class="link-btn" type="button" id="sendEmailCode">إرسال الكود</button>
+    <button class="link-btn" type="button" id="backToLogin">رجوع لتسجيل الدخول</button>
+  </div>
+</form>
+<p id="authFeedback" class="fine" role="status" aria-live="polite" hidden></p>
+</dialog>
+<dialog id="securityDialog" aria-labelledby="securityTitle">
+  <div class="modal-head"><h2 id="securityTitle">أمان الحساب</h2><button type="button" class="icon-btn" id="closeSecurity" aria-label="إغلاق">×</button></div>
+  <p id="factorStatus"></p>
+  <button id="startAuthenticator" type="button" class="btn btn-outline">إعداد تطبيق Authenticator</button>
+  <form id="factorForm" hidden>
+    <div id="factorKeyBox" class="field" hidden>
+      <label for="factorKey">أضف مفتاح الإعداد في تطبيق Authenticator باختيار «حسب الوقت»</label>
+      <input id="factorKey" dir="ltr" readonly>
+    </div>
+    <div class="field"><label for="factorCode" id="factorCodeLabel">كود التطبيق</label>
+      <input id="factorCode" dir="ltr" autocomplete="one-time-code" maxlength="20" required>
+    </div>
+    <button id="saveFactor" class="btn btn-solid" type="submit">تفعيل التحقق بخطوتين</button>
+  </form>
+  <div id="recoveryBox" hidden>
+    <p>احفظ الأكواد دي في مكان آمن. كل كود يُستخدم مرة واحدة عند تعذّر الوصول إلى تطبيق Authenticator.</p>
+    <pre id="recoveryCodes" dir="ltr"></pre>
+  </div>
+  <section id="googleLinkBox" hidden>
+    <h3>ربط حساب Google</h3>
+    <div class="field"><label for="linkPassword">كلمة مرور حساب DareCare</label>
+      <input type="password" id="linkPassword" autocomplete="current-password">
+    </div>
+    <div id="googleLink" class="google-slot"></div>
+  </section>
+  <p id="securityFeedback" class="fine" role="status" aria-live="polite" hidden></p>
+</dialog>
 <div role="status" aria-live="polite" id="toast" class="toast" hidden></div>
 </body>
 </html>

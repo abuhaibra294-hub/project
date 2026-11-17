@@ -12,6 +12,7 @@ public sealed class RegisterPatientRequest
     public string Password { get; set; } = "";
     [Required, Phone, StringLength(32)]
     public string PhoneNumber { get; set; } = "";
+    public bool UseEmailOtp { get; set; }
 }
 
 public sealed class RegisterNurseRequest
@@ -28,6 +29,7 @@ public sealed class RegisterNurseRequest
     public string LicenseNumber { get; set; } = "";
     [Range(0, 60)]
     public int YearsOfExperience { get; set; }
+    public bool UseEmailOtp { get; set; }
 }
 
 public sealed class LoginRequest

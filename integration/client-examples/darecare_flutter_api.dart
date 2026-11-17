@@ -34,12 +34,23 @@ class DareCareApi {
     }
   }
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
-    final response = await httpClient.post(Uri.parse('$baseUrl/api/v1/auth/login'),
+  Future<Map<String, dynamic>> login(String email, String password) =>
+      _signIn('login', {'email': email, 'password': password});
+
+  Future<Map<String, dynamic>> loginWithGoogle(String idToken) =>
+      _signIn('google', {'idToken': idToken});
+
+  Future<Map<String, dynamic>> completeAuthenticatorLogin(String challengeToken, String code) =>
+      _signIn('authenticator/login', {'challengeToken': challengeToken, 'code': code});
+
+  Future<Map<String, dynamic>> _signIn(String path, Map<String, String> body) async {
+    final response = await httpClient.post(Uri.parse('$baseUrl/api/v1/auth/$path'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}));
+        body: jsonEncode(body));
     final json = _checked(response);
-    await store.save(json['accessToken'] as String, json['refreshToken'] as String);
+    if (response.statusCode == 200) {
+      await store.save(json['accessToken'] as String, json['refreshToken'] as String);
+    }
     return json;
   }
 

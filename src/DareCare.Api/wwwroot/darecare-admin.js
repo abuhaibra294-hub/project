@@ -3,7 +3,7 @@
   'use strict';
 
   const $ = id => document.getElementById(id);
-  const state = {accessToken:null,refreshToken:null,user:null,view:'overview',usersPage:1,auditPage:1,generation:0};
+  const state = {accessToken:null,refreshToken:null,challengeToken:null,user:null,view:'overview',usersPage:1,auditPage:1,generation:0};
   const titles = {
     overview:['نظرة عامة','المتابعة المباشرة لحالة المنصة'],
     nurses:['اعتماد التمريض','مراجعة بيانات الممرضين وطلباتهم'],
@@ -78,11 +78,24 @@
     }
     return body;
   }
+  function setLoginFactor(challengeToken=null) {
+    state.challengeToken=challengeToken;
+    $('adminCredentials').hidden=!!challengeToken;
+    $('adminEmail').required=!challengeToken;
+    $('adminPassword').required=!challengeToken;
+    $('adminFactor').hidden=!challengeToken;
+    $('adminFactorCode').required=!!challengeToken;
+    $('adminFactorCode').value='';
+    $('adminPassword').value='';
+    $('loginSubmit').textContent=challengeToken?'تأكيد الكود':'دخول لوحة الإدارة ←';
+    if(challengeToken)$('adminFactorCode').focus();
+  }
   function lockPortal(message='') {
     state.accessToken=null;state.refreshToken=null;state.user=null;state.generation++;
     $('adminWorkspace').hidden=true;$('loginScreen').hidden=false;
     $('adminPassword').value='';
     $('adminLoginForm').reset();
+    setLoginFactor();
     if(message){$('loginError').textContent=message;$('loginError').hidden=false;}
   }
   async function revoke(access,refresh) {
@@ -102,9 +115,19 @@
     btn.disabled=true;btn.textContent='جارِ التحقق من الحساب...';
     let response;
     try {
-      response=await request('/api/v1/auth/login',{anonymous:true,method:'POST',data:{
-        email:$('adminEmail').value.trim(),password:$('adminPassword').value
-      }});
+      if(state.challengeToken){
+        response=await request('/api/v1/auth/authenticator/login',{anonymous:true,method:'POST',data:{
+          challengeToken:state.challengeToken,code:$('adminFactorCode').value.trim()
+        }});
+      } else {
+        response=await request('/api/v1/auth/login',{anonymous:true,method:'POST',data:{
+          email:$('adminEmail').value.trim(),password:$('adminPassword').value
+        }});
+        if(response?.twoFactorRequired){
+          setLoginFactor(response.challengeToken);
+          return;
+        }
+      }
       const roles=Array.isArray(response?.roles)?response.roles:[];
       if(!roles.includes('Admin')){
         await revoke(response?.accessToken,response?.refreshToken);
@@ -127,6 +150,7 @@
       state.user=me;
       $('adminIdentity').textContent=me.fullName||me.email||'مدير النظام';
       $('adminPassword').value='';
+      setLoginFactor();
       $('loginScreen').hidden=true;
       $('adminWorkspace').hidden=false;
       clearError();
@@ -134,12 +158,12 @@
       setView('overview',overview);
       notify('أهلًا بك في لوحة إدارة DareCare.');
     }catch(err){
-      lockPortal();
+      if(!state.challengeToken||response?.accessToken)lockPortal();
       error.textContent=err.message||'تعذر تسجيل الدخول.';
       error.hidden=false;
     }finally{
       btn.disabled=false;
-      btn.textContent='دخول لوحة الإدارة ←';
+      btn.textContent=state.challengeToken?'تأكيد الكود':'دخول لوحة الإدارة ←';
     }
   }
   async function logout() {
@@ -359,6 +383,11 @@
   }
   function init() {
     $('adminLoginForm').addEventListener('submit',login);
+    $('adminFactorBack').addEventListener('click',()=>{
+      setLoginFactor();
+      $('loginError').hidden=true;
+      $('adminPassword').focus();
+    });
     $('togglePassword').addEventListener('click',()=>{
       const field=$('adminPassword'),btn=$('togglePassword'),show=field.type==='password';
       field.type=show?'text':'password';

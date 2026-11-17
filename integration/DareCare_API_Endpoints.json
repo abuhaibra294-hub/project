@@ -1,7 +1,7 @@
 {
   "version": "v1",
   "source": "ASP.NET C# controller route attributes",
-  "count": 93,
+  "count": 100,
   "endpoints": [
     {
       "method": "GET",
@@ -82,6 +82,34 @@
     },
     {
       "method": "POST",
+      "path": "/api/v1/auth/authenticator/disable",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/authenticator/enable",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/authenticator/login",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/authenticator/setup",
+      "roles": [
+        "Authenticated"
+      ]
+    },
+    {
+      "method": "POST",
       "path": "/api/v1/auth/change-password",
       "roles": [
         "Authenticated"
@@ -92,6 +120,27 @@
       "path": "/api/v1/auth/forgot-password",
       "roles": [
         "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/google",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/google/config",
+      "roles": [
+        "Public"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/google/link",
+      "roles": [
+        "Patient"
       ]
     },
     {

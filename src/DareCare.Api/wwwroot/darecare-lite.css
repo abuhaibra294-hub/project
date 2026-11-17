@@ -23,3 +23,25 @@
 @media(max-width:520px){.profile-form{grid-template-columns:1fr}.profile-form>button{justify-self:stretch}.mode-tabs button{font-size:10px}.skill-choice{flex:1 1 auto}}
 
 .admin-entry{color:#d6eee6;font-size:11px;font-weight:800;text-decoration:underline;text-underline-offset:4px}.admin-entry:hover{color:#fff}
+
+.auth-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+  margin-block-start: .75rem;
+}
+.google-slot {
+  margin-block-start: 1rem;
+}
+#securityDialog {
+  padding: 1.25rem;
+}
+#securityDialog section {
+  margin-block-start: 1.25rem;
+}
+#recoveryCodes {
+  padding: .75rem;
+  background: var(--soft);
+  text-align: center;
+  white-space: pre-wrap;
+}

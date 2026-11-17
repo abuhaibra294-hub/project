@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const state = {session:null, me:null, services:[], nurses:[], pharmacies:[], service:null, nurse:null, slots:[], mode:'login', pendingAction:null};
+  const state = {session:null, me:null, services:[], nurses:[], pharmacies:[], service:null, nurse:null, slots:[], mode:'login', authStage:null, mfaChallenge:null, pendingAction:null};
   const dictionary = { 'Elderly Home Nursing':'تمريض ورعاية كبار السن', 'Wound Dressing':'تغيير الضمادات والجروح', 'Injection Visit':'زيارة لإعطاء حقنة', 'Elderly Care':'رعاية كبار السن', 'Injection Administration':'إعطاء الحقن', Pending:'قيد الانتظار', Accepted:'تم قبول الحجز', InProgress:'جاري التنفيذ', Completed:'مكتمل', Cancelled:'ملغي', Rejected:'مرفوض', Quoted:'تم إرسال السعر', Confirmed:'مؤكد', Preparing:'قيد التجهيز', OutForDelivery:'خرج للتوصيل', Delivered:'تم التوصيل', Declined:'مرفوض'};
   const say = text => dictionary[text] || text || 'غير محدد';
   const money = n => Number.isFinite(Number(n)) ? Number(n).toLocaleString('ar-EG') : '—';
@@ -40,8 +40,22 @@
   async function loadNurses(){const box=$('nurseList');const p=new URLSearchParams({page:'1',pageSize:'12'});const city=$('citySearch').value.trim();if(city)p.set('city',city);if(state.service?.requiredSkillId)p.set('skillId',state.service.requiredSkillId);empty(box,'جارِ تحميل طاقم التمريض...');try{const res=await api('/api/v1/nurses/search?'+p);state.nurses=res.items||[];box.replaceChildren();if(!state.nurses.length){empty(box,state.service?'مفيش ممرضين معتمدين للخدمة دي حاليًا. جرّب خدمة تانية.':'لا يوجد ممرضون معتمدون مطابقون للبحث حاليًا. اعتماد الممرض يتطلب إنشاء حساب مهني وموافقة الإدارة.');if(!state.service)box.append(button('سجّل كممرض تجريبي',async()=>{setMode('nurse');$('authDialog').showModal();},'btn btn-outline btn-sm'));return;}for(const n of state.nurses){const c=node('article','card');c.append(cardTitle(n.fullName||'مقدم رعاية',n.city||'المدينة غير محددة','♙'));if(n.bio)c.append(node('p','',n.bio));const tags=node('div','tags');for(const skill of (n.skills||[]).slice(0,3))tags.append(node('span','pill',say(skill.name)));c.append(tags);const meta=node('div','meta-row');meta.append(node('span','',`${n.yearsOfExperience||0} سنوات خبرة`),node('span','',n.serviceArea||''));c.append(meta);const bottom=node('div','card-bottom');bottom.append(node('strong','price',`${money(n.hourlyRate)} · سعر الساعة`),button('الأوقات المتاحة ←',async()=>await selectNurse(n)));c.append(bottom);box.append(c);}}catch(e){empty(box,'تعذر تحميل التمريض: '+e.message,true);}}
   async function selectNurse(n){if(!state.service){toast('اختار الخدمة من القسم الأول قبل حجز الموعد.');scroll('services');return;}state.nurse=n;$('bookingPanel').hidden=false;$('bookingIntro').textContent=`${say(state.service.name)} مع ${n.fullName||'مقدم رعاية'} — السعر الأساسي ${money(state.service.basePrice)}`;const sel=$('slotSelect');sel.replaceChildren(new Option('جارِ تحميل الأوقات...', ''));try{state.slots=await api(`/api/v1/nurses/${encodeURIComponent(n.id)}/slots`);sel.replaceChildren(new Option('اختار موعدًا متاحًا',''));let available=0;for(const slot of state.slots){const duration=(Date.parse(slot.endsAtUtc)-Date.parse(slot.startsAtUtc))/60000;if(duration>=Number(state.service.durationMinutes||0)){sel.append(new Option(date(slot.startsAtUtc),slot.id));available++;}}if(!available)toast('الممرض ده مفيش عنده مواعيد مناسبة حاليًا.');}catch(e){sel.replaceChildren(new Option('تعذر جلب الأوقات',''));toast(e.message,true);}scroll('bookingPanel');}
   async function loadPharmacies(){const box=$('pharmacyList');try{state.pharmacies=await api('/api/v1/pharmacies/available');box.replaceChildren();const sel=$('rxPharmacy');sel.replaceChildren(new Option('اختار صيدلية',''));if(!state.pharmacies.length)return empty(box,'لسه مفيش صيدليات معتمدة متاحة على السيرفر.');for(const p of state.pharmacies){const c=node('article','card');c.append(cardTitle(p.businessName||'صيدلية',p.city||'','⌁'));c.append(node('p','',p.address||'العنوان غير محدد'));c.append(button('إرسال روشتة للصيدلية ←',async()=>{if(!state.session){openAuth();toast('سجل دخول مريض الأول لرفع الروشتة.');return;}if(!state.session.roles?.includes('Patient')){toast('رفع الروشتات متاح لحساب المريض فقط.',true);return;}sel.value=p.id;scroll('pharmacies');$('rxFile').focus();}));box.append(c);sel.append(new Option(p.businessName,p.id));}}catch(e){empty(box,'تعذر تحميل الصيدليات: '+e.message,true);}}
-  function openAuth(){setMode('login');$('authDialog').showModal();}
-  function setMode(mode){state.mode=mode;const reg=mode!=='login',nurse=mode==='nurse';$('authTitle').textContent=nurse?'إنشاء حساب ممرض':reg?'إنشاء حساب مريض جديد':'تسجيل الدخول';$('nameField').hidden=!reg;$('phoneField').hidden=!reg;$('licenseField').hidden=!nurse;$('yearsField').hidden=!nurse;$('passwordTip').hidden=!reg;$('fullName').required=reg;$('phone').required=reg;$('licenseNumber').required=nurse;$('nurseYears').required=nurse;$('password').minLength=reg?12:1;$('password').autocomplete=reg?'new-password':'current-password';$('authSubmit').textContent=reg?'إنشاء الحساب':'دخول';$('loginMode').classList.toggle('active',!reg);$('registerMode').classList.toggle('active',mode==='register');$('nurseMode').classList.toggle('active',nurse);}
+  function openAuth(){
+    setMode('login');
+    $('authDialog').showModal();
+    renderGoogle('googleSignIn').catch(() => feedback('authFeedback','تعذر تحميل تسجيل الدخول بجوجل.',true));
+  }
+  function resetAuthStage(){
+    state.authStage=null;
+    state.mfaChallenge=null;
+    $('authForm').hidden=false;
+    $('authModes').hidden=false;
+    $('authCodeForm').hidden=true;
+    $('authCodeForm').reset();
+    $('authAlternatives').hidden=state.mode!=='login';
+    feedback('authFeedback','');
+  }
+  function setMode(mode){state.mode=mode;resetAuthStage();const reg=mode!=='login',nurse=mode==='nurse';$('authTitle').textContent=nurse?'إنشاء حساب ممرض':reg?'إنشاء حساب مريض جديد':'تسجيل الدخول';$('nameField').hidden=!reg;$('phoneField').hidden=!reg;$('licenseField').hidden=!nurse;$('yearsField').hidden=!nurse;$('passwordTip').hidden=!reg;$('fullName').required=reg;$('phone').required=reg;$('licenseNumber').required=nurse;$('nurseYears').required=nurse;$('password').minLength=reg?12:1;$('password').autocomplete=reg?'new-password':'current-password';$('authSubmit').textContent=reg?'إنشاء الحساب':'دخول';$('loginMode').classList.toggle('active',!reg);$('registerMode').classList.toggle('active',mode==='register');$('nurseMode').classList.toggle('active',nurse);}
   function initSession(data){state.session={accessToken:data.accessToken,refreshToken:data.refreshToken,roles:data.roles||[],userId:data.userId};$('authDialog').close();$('authBtn').hidden=true;$('logoutBtn').hidden=false;$('dashLink').hidden=false;$('dashboard').hidden=false;$('rxForm').hidden=!state.session.roles.includes('Patient');}
   async function logout(){if(state.session){try{await api('/api/v1/auth/logout',{method:'POST',body:{refreshToken:state.session.refreshToken}});}catch(_){ /* Still erase local tokens. */ }}wipe();toast('تم تسجيل الخروج.');scroll('services');}
   function stat(label,value){const s=node('div','stat');s.append(node('span','',label),node('strong','',String(value??0)));return s;}
@@ -114,7 +128,226 @@
   async function adminPanels(box){const overview=await api('/api/v1/admin/overview');const s=panel('ملخص المنصة');[['المرضى النشطون',overview.activePatients],['التمريض المعتمد',overview.nursesApproved],['التمريض في انتظار الموافقة',overview.nursesPending],['الصيدليات المعتمدة',overview.pharmaciesApproved],['صيدليات تنتظر الموافقة',overview.pharmaciesPending],['الروشتات',overview.prescriptions]].forEach(([k,v])=>s.append(infoRow(k,String(v??0))));box.append(s);const p=panel('طلبات الموافقة على التمريض');const pending=await api('/api/v1/admin/nurses/pending');putList(p,pending,item=>{const r=infoRow(item.fullName||'ممرض',`${item.city||'بدون مدينة'} · ترخيص ${item.licenseNumber||'غير مسجل'} · ${item.email||''} · ${item.skills?.join('، ')||'لم تُسجّل مهارات بعد'}`);if(item.skills?.length){actions(r,[{label:'اعتماد الممرض',run:async()=>{if(!confirm('تأكد من مراجعة الترخيص والمهارات. هل تعتمد الممرض في هذه البيئة التجريبية؟'))return;await api('/api/v1/admin/nurses/'+encodeURIComponent(item.id)+'/approval',{method:'PATCH',body:{approved:true}});toast('تم اعتماد الممرض.');await refreshDashboard();}}]);}else r.append(node('small','muted','لا يمكن الاعتماد قبل اختيار المهارات.'));return r;});box.append(p);}
   async function refreshDashboard(){if(!state.session)return;$('dashboard').hidden=false;const stats=$('stats'),box=$('accountSections');stats.replaceChildren();box.replaceChildren(node('p','empty','جارِ جلب بيانات حسابك...'));try{const [me,summary]=await Promise.all([api('/api/v1/auth/me'),api('/api/v1/dashboard/me')]);state.me=me;const role=summary.role||state.session.roles?.[0];$('dashboardTitle').textContent=`أهلاً ${me.fullName||''}`;$('dashboardLead').textContent=`حساب ${({Patient:'مريض',Nurse:'ممرض',Pharmacy:'صيدلية',Admin:'إدارة'})[role]||role} — بيانات مباشرة من السيرفر.`;stats.replaceChildren();let statData;if(role==='Patient')statData=[['حجوزات بانتظار الرد',summary.pendingBookings],['زيارات قادمة',summary.upcomingVisits],['زيارات مكتملة',summary.completedVisits],['طلبات دواء مكتملة',summary.completedPharmacyOrders]];else if(role==='Nurse')statData=[['طلبات جديدة',summary.pendingRequests],['زيارات مقبولة',summary.acceptedVisits],['زيارات مكتملة',summary.completedVisits],['مواعيد قادمة',summary.upcomingSlots]];else if(role==='Pharmacy')statData=[['روشتات مستلمة',summary.prescriptionsReceived],['بانتظار التسعير',summary.pendingQuotes],['قيد التنفيذ',summary.ordersInProgress],['تم التوصيل',summary.deliveredOrders]];else statData=[['المرضى',summary.totalPatients],['التمريض المنتظر',summary.pendingNurses],['الصيدليات المنتظرة',summary.pendingPharmacies],['الحجوزات',summary.totalBookings]];statData.forEach(x=>stats.append(stat(...x)));box.replaceChildren();if(role==='Patient')await patientPanels(box);else if(role==='Nurse')await nursePanels(box);else if(role==='Pharmacy')await pharmacyPanels(box);else if(role==='Admin')await adminPanels(box);else empty(box,'دور الحساب ده مش مغطى في النسخة الخفيفة.');}catch(e){empty(box,'تعذر تحميل حسابك: '+e.message,true);}}
   $('authBtn').addEventListener('click',openAuth);$('closeAuth').addEventListener('click',()=>$('authDialog').close());$('loginMode').addEventListener('click',()=>setMode('login'));$('registerMode').addEventListener('click',()=>setMode('register'));$('nurseMode').addEventListener('click',()=>setMode('nurse'));$('logoutBtn').addEventListener('click',logout);$('refreshDashboard').addEventListener('click',refreshDashboard);$('searchNurses').addEventListener('submit',e=>{e.preventDefault();loadNurses();});
-  $('authForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('authSubmit');btn.disabled=true;try{const email=$('email').value.trim(),password=$('password').value;const registered=state.mode!=='login',nurse=state.mode==='nurse';const path=nurse?'/api/v1/auth/register/nurse':registered?'/api/v1/auth/register/patient':'/api/v1/auth/login';const body=registered?{email,password,fullName:$('fullName').value.trim(),phoneNumber:$('phone').value.trim()}:{email,password};if(nurse){body.licenseNumber=$('licenseNumber').value.trim();body.yearsOfExperience=Number($('nurseYears').value);}const data=await api(path,{method:'POST',body});if(data?.accessToken){initSession(data);toast(nurse?'تم تسجيل الممرض. كمّل ملفك وحدد المهارات علشان الإدارة تراجعه.':registered?'تم إنشاء حساب المريض والدخول.':'أهلاً بيك من جديد.');await refreshDashboard();if(state.pendingAction==='booking'&&state.session.roles.includes('Patient')&&!$('bookingPanel').hidden){state.pendingAction=null;scroll('bookingPanel');toast('تم تسجيل الدخول. اختار الموعد واضغط تأكيد طلب الحجز.');}else{state.pendingAction=null;scroll('dashboard');}}else{toast(data?.message||'تم استلام الطلب. افحص بريدك الإلكتروني.');$('authDialog').close();}}catch(err){toast(err.message,true);}finally{btn.disabled=false;}});
+  async function afterSignIn(data,message){
+    initSession(data);
+    $('authForm').reset();
+    toast(message);
+    await refreshDashboard();
+    const resumeBooking=state.pendingAction==='booking'&&state.session?.roles.includes('Patient')&&!$('bookingPanel').hidden;
+    state.pendingAction=null;
+    scroll(resumeBooking?'bookingPanel':'dashboard');
+    if(resumeBooking)toast('تم تسجيل الدخول. اختار الموعد واضغط تأكيد طلب الحجز.');
+  }
+
+  function feedback(id,message,error=false){
+    const box=$(id);
+    box.textContent=message;
+    box.hidden=!message;
+    box.classList.toggle('error-state',error);
+  }
+
+  function openCodeStage(stage,{email='',challenge=null,sent=false}={}){
+    state.authStage=stage;
+    state.mfaChallenge=challenge;
+    const mfa=stage==='mfa', reset=stage==='reset';
+    $('authForm').hidden=true;
+    $('authModes').hidden=true;
+    $('authAlternatives').hidden=true;
+    $('authCodeForm').reset();
+    $('authCodeForm').hidden=false;
+    $('authTitle').textContent=mfa?'التحقق بخطوتين':reset?'استعادة كلمة المرور':'تأكيد البريد الإلكتروني';
+    $('authCodeHint').textContent=mfa?'اكتب كود التطبيق أو أحد أكواد الاسترداد.':'اطلب كودًا من 6 أرقام على بريدك وأدخله خلال 10 دقائق.';
+    $('codeEmailField').hidden=mfa;
+    $('codeEmail').required=!mfa;
+    $('codeEmail').value=email;
+    $('resetPasswordField').hidden=!reset;
+    $('newAuthPassword').required=reset;
+    $('authCode').inputMode=mfa?'text':'numeric';
+    $('authCode').maxLength=mfa?20:6;
+    $('sendEmailCode').hidden=mfa;
+    feedback('authFeedback',sent?'لو البريد مؤهل، هيصلك كود التأكيد.':'');
+    $(mfa||sent?'authCode':'codeEmail').focus();
+  }
+
+  $('authForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const btn=$('authSubmit');
+    btn.disabled=true;
+    feedback('authFeedback','');
+    try{
+      const email=$('email').value.trim(),password=$('password').value;
+      const registered=state.mode!=='login',nurse=state.mode==='nurse';
+      const route=nurse?'register/nurse':registered?'register/patient':'login';
+      const body=registered?{email,password,fullName:$('fullName').value.trim(),phoneNumber:$('phone').value.trim(),useEmailOtp:true}:{email,password};
+      if(nurse){
+        body.licenseNumber=$('licenseNumber').value.trim();
+        body.yearsOfExperience=Number($('nurseYears').value);
+      }
+      const data=await api('/api/v1/auth/'+route,{method:'POST',body});
+      if(data?.twoFactorRequired){
+        $('password').value='';
+        openCodeStage('mfa',{challenge:data.challengeToken});
+      }else if(data?.accessToken){
+        await afterSignIn(data,nurse?'تم تسجيل الممرض. كمّل ملفك وحدد المهارات علشان الإدارة تراجعه.':registered?'تم إنشاء حساب المريض.':'أهلاً بيك من جديد.');
+      }else if(registered){
+        $('password').value='';
+        openCodeStage('verify',{email,sent:true});
+      }
+    }catch(error){feedback('authFeedback',error.message,true);}
+    finally{btn.disabled=false;}
+  });
+
+  $('openVerifyEmail').addEventListener('click',()=>openCodeStage('verify',{email:$('email').value.trim()}));
+  $('openResetPassword').addEventListener('click',()=>openCodeStage('reset',{email:$('email').value.trim()}));
+  $('backToLogin').addEventListener('click',()=>setMode('login'));
+  $('authDialog').addEventListener('close',()=>{
+    $('password').value='';
+    resetAuthStage();
+  });
+  $('sendEmailCode').addEventListener('click',async ()=>{
+    if(!$('codeEmail').reportValidity())return;
+    const button=$('sendEmailCode');
+    button.disabled=true;
+    try{
+      const route=state.authStage==='reset'?'forgot-password':'resend-verification';
+      await api('/api/v1/auth/'+route,{method:'POST',body:{email:$('codeEmail').value.trim(),useEmailOtp:true}});
+      feedback('authFeedback','لو الحساب مؤهل، هيصلك كود على بريدك. تقدر تطلب كود جديد بعد دقيقة.');
+      $('authCode').focus();
+    }catch(error){feedback('authFeedback',error.message,true);}
+    finally{button.disabled=false;}
+  });
+  $('authCodeForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const button=$('confirmAuthCode');
+    button.disabled=true;
+    try{
+      const code=$('authCode').value.trim();
+      if(state.authStage==='mfa'){
+        const session=await api('/api/v1/auth/authenticator/login',{method:'POST',body:{code,challengeToken:state.mfaChallenge}});
+        await afterSignIn(session,'تم تسجيل الدخول.');
+      }else{
+        const reset=state.authStage==='reset',email=$('codeEmail').value.trim();
+        const body={email,code};
+        if(reset)body.newPassword=$('newAuthPassword').value;
+        await api('/api/v1/auth/'+(reset?'reset-password':'verify-email'),{method:'POST',body});
+        setMode('login');
+        $('email').value=email;
+        $('password').focus();
+        feedback('authFeedback',reset?'تم تغيير كلمة المرور. سجّل الدخول بالكلمة الجديدة.':'تم تأكيد البريد. تقدر تسجّل الدخول دلوقتي.');
+      }
+    }catch(error){feedback('authFeedback',error.message,true);}
+    finally{button.disabled=false;}
+  });
+
+  let googleReady;
+  function loadGoogle(){
+    googleReady??=(async ()=>{
+      const config=await api('/api/v1/auth/google/config');
+      if(!config?.webClientId)return null;
+      const script=document.createElement('script');
+      script.src='https://accounts.google.com/gsi/client';
+      await new Promise((resolve,reject)=>{
+        script.addEventListener('load',resolve,{once:true});
+        script.addEventListener('error',reject,{once:true});
+        document.head.append(script);
+      });
+      const google=window.google.accounts.id;
+      google.initialize({client_id:config.webClientId,callback:handleGoogleCredential});
+      return google;
+    })().catch(error=>{googleReady=null;throw error;});
+    return googleReady;
+  }
+  async function renderGoogle(targetId){
+    const google=await loadGoogle();
+    if(!google)return;
+    const target=$(targetId);
+    target.hidden=false;
+    if(!target.hasChildNodes())google.renderButton(target,{type:'standard',theme:'outline',size:'large',locale:'ar'});
+  }
+  async function handleGoogleCredential({credential}){
+    if(!credential)return;
+    if($('securityDialog').open&&state.session?.roles.includes('Patient')){
+      const currentPassword=$('linkPassword').value;
+      if(!currentPassword)return feedback('securityFeedback','اكتب كلمة مرور DareCare، وبعدها اختار حساب Google.',true);
+      try{
+        await api('/api/v1/auth/google/link',{method:'POST',body:{idToken:credential,currentPassword}});
+        $('linkPassword').value='';
+        feedback('securityFeedback','تم ربط حساب Google.');
+      }catch(error){feedback('securityFeedback',error.message,true);}
+      return;
+    }
+    if(!$('authDialog').open||state.mode!=='login'||state.authStage||state.session)return;
+    try{
+      const data=await api('/api/v1/auth/google',{method:'POST',body:{idToken:credential}});
+      if(data?.twoFactorRequired)openCodeStage('mfa',{challenge:data.challengeToken});
+      else if(data?.accessToken)await afterSignIn(data,'تم تسجيل الدخول بجوجل.');
+    }catch(error){feedback('authFeedback',error.message,true);}
+  }
+
+  function setFactorStatus(enabled){
+    $('factorStatus').textContent=enabled?'التحقق بخطوتين مفعّل.':'التحقق بخطوتين غير مفعّل.';
+    $('startAuthenticator').hidden=enabled;
+    $('factorForm').hidden=!enabled;
+    $('factorKeyBox').hidden=true;
+    $('factorCodeLabel').textContent=enabled?'كود التطبيق أو كود استرداد':'كود التطبيق';
+    $('saveFactor').textContent=enabled?'إيقاف التحقق بخطوتين':'تفعيل التحقق بخطوتين';
+  }
+  $('securityButton').addEventListener('click',async ()=>{
+    if(!state.session)return;
+    $('securityDialog').showModal();
+    $('startAuthenticator').hidden=true;
+    $('factorForm').hidden=true;
+    $('factorStatus').textContent='جارِ تحميل حالة التحقق…';
+    try{
+      state.me=await api('/api/v1/auth/me');
+      setFactorStatus(state.me.twoFactorEnabled);
+      if(state.session.roles.includes('Patient')&&await loadGoogle()){
+        $('googleLinkBox').hidden=false;
+        await renderGoogle('googleLink');
+      }
+    }catch(error){feedback('securityFeedback',error.message,true);}
+  });
+  $('closeSecurity').addEventListener('click',()=>$('securityDialog').close());
+  $('securityDialog').addEventListener('close',()=>{
+    $('factorForm').reset();
+    $('factorKey').value='';
+    $('linkPassword').value='';
+    $('recoveryCodes').textContent='';
+    $('recoveryBox').hidden=true;
+    $('googleLinkBox').hidden=true;
+    feedback('securityFeedback','');
+  });
+  $('startAuthenticator').addEventListener('click',async ()=>{
+    const button=$('startAuthenticator');
+    button.disabled=true;
+    try{
+      const setup=await api('/api/v1/auth/authenticator/setup',{method:'POST'});
+      if(!$('securityDialog').open)return;
+      $('factorKey').value=setup.sharedKey;
+      $('factorKeyBox').hidden=false;
+      $('factorForm').hidden=false;
+      $('factorCode').focus();
+      button.textContent='إنشاء مفتاح إعداد جديد';
+    }catch(error){feedback('securityFeedback',error.message,true);}
+    finally{button.disabled=false;}
+  });
+  $('factorForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const button=$('saveFactor'), enabled=state.me?.twoFactorEnabled;
+    button.disabled=true;
+    try{
+      const data=await api('/api/v1/auth/authenticator/'+(enabled?'disable':'enable'),{method:'POST',body:{code:$('factorCode').value.trim()}});
+      state.session={...state.session,...(enabled?data:data.session)};
+      state.me.twoFactorEnabled=!enabled;
+      $('factorKey').value='';
+      $('factorForm').reset();
+      $('recoveryCodes').textContent=(data.recoveryCodes||[]).join('\n');
+      $('recoveryBox').hidden=enabled;
+      setFactorStatus(!enabled);
+      feedback('securityFeedback',enabled?'تم إيقاف التحقق بخطوتين.':'تم تفعيل التحقق بخطوتين. احفظ أكواد الاسترداد قبل إغلاق النافذة.');
+    }catch(error){feedback('securityFeedback',error.message,true);}
+    finally{button.disabled=false;}
+  });
   $('bookingForm').addEventListener('submit',async e=>{e.preventDefault();if(!state.session){state.pendingAction='booking';openAuth();toast('سجّل الدخول علشان تأكد الحجز.');return;}if(!state.session.roles?.includes('Patient'))return toast('الحجز متاح لحساب المريض فقط.',true);if(!state.service||!state.nurse)return toast('اختار الخدمة والممرض الأول.',true);const b=e.submitter;b.disabled=true;try{await api('/api/v1/bookings',{method:'POST',body:{careServiceId:state.service.id,nurseProfileId:state.nurse.id,availabilitySlotId:$('slotSelect').value,serviceAddress:$('visitAddress').value.trim()}});toast('تم إرسال الحجز للممرض بنجاح.');$('bookingPanel').hidden=true;await loadNurses();await refreshDashboard();scroll('dashboard');}catch(err){toast(err.message,true);}finally{b.disabled=false;}});
   $('rxForm').addEventListener('submit',async e=>{e.preventDefault();const file=$('rxFile').files[0];if(!file)return toast('اختار ملف الروشتة الأول.',true);if(file.size>8*1024*1024)return toast('الحد الأقصى للملف 8MB.',true);if(!/\.(pdf|jpe?g|png)$/i.test(file.name))return toast('نوع الملف غير مدعوم.',true);if(!confirm('هذه بيئة تجريبية مؤقتة. تأكد أن الملف وهمي ولا يحتوي على أي بيانات طبية حقيقية. هل تريد الإرسال؟'))return;const b=e.submitter;b.disabled=true;try{const fd=new FormData();fd.append('pharmacyProfileId',$('rxPharmacy').value);fd.append('file',file);fd.append('notes',$('rxNotes').value.trim());await api('/api/v1/prescriptions',{method:'POST',body:fd});toast('تم إرسال الروشتة التجريبية للصيدلية.');$('rxFile').value='';await refreshDashboard();scroll('dashboard');}catch(err){toast(err.message,true);}finally{b.disabled=false;}});
   Promise.allSettled([loadServices(),loadNurses(),loadPharmacies()]);

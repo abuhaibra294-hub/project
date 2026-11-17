@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using DareCare.Api.Security;
 using DareCare.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
@@ -12,6 +13,7 @@ public interface IAccountEmailService
     bool IsConfigured { get; }
     Task SendVerificationAsync(ApplicationUser user, CancellationToken ct);
     Task SendPasswordResetAsync(ApplicationUser user, CancellationToken ct);
+    Task SendOtpAsync(ApplicationUser user, string code, EmailOtpPurpose purpose, int lifetimeMinutes, CancellationToken ct);
 }
 
 public sealed class AccountEmailService(
@@ -42,6 +44,14 @@ public sealed class AccountEmailService(
 
     private static string Encode(string token) =>
         WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+    public Task SendOtpAsync(ApplicationUser user, string code, EmailOtpPurpose purpose, int lifetimeMinutes, CancellationToken ct)
+    {
+        var action = purpose == EmailOtpPurpose.VerifyEmail ? "verify your email" : "reset your password";
+        return SendAsync(user.Email!, $"DareCare code to {action}",
+            $"Your DareCare code to {action}:\n{code}\n\n" +
+            $"This code expires in {lifetimeMinutes} minutes and can be used once. If you did not request it, ignore this message.", ct);
+    }
 
     private async Task SendAsync(string to, string subject, string body, CancellationToken ct)
     {
