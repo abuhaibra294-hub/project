@@ -1,10 +1,10 @@
 # DareCare — Software Component Diagram
-**Owner:** Abdel Maqsoud | **Notion task:** Component Diagram | **Priority:** Medium | **Source:** \`DareCare.slnx\`, \`src/\`, \`Program.cs\`, runtime controller/DTO references, 19 Nov 2026.
+**Owner:** Abdel Maqsoud | **Notion task:** Component Diagram | **Priority:** Medium | **Source:** `DareCare.slnx`, `src/`, `Program.cs`, runtime controller/DTO references, 19 Nov 2026.
 
 ## Component structure — what exists now
-DARECARE is a **layered modular monolith**, not an implemented microservices system. \`DareCare.Application\` **currently contains API contract DTOs**, not a complete use-case/service bus. Several controllers directly coordinate EF Core persistence and domain methods. The diagram intentionally shows that practical as-is coupling.
+DARECARE is a **layered modular monolith**, not an implemented microservices system. `DareCare.Application` **currently contains API contract DTOs**, not a complete use-case/service bus. Several controllers directly coordinate EF Core persistence and domain methods. The diagram intentionally shows that practical as-is coupling.
 
-\`\`\`mermaid
+```mermaid
 flowchart TB
   subgraph USERS["Presentation / clients"]
     FL["Flutter Patient App (team client deliverable)"]
@@ -70,18 +70,18 @@ flowchart TB
   MAIL -.-> SMTP
   PHARMA --> STORE
   STORE --> FILES
-\`\`\`
+```
 
 **Clarifying boundaries**
-- \`DareCare.Api\` references Application and Infrastructure project assemblies; Application and Infrastructure depend on Domain. Controllers may call the domain entities/DbContext directly, so this is **not** falsely presented as fully implemented Clean Architecture.
+- `DareCare.Api` references Application and Infrastructure project assemblies; Application and Infrastructure depend on Domain. Controllers may call the domain entities/DbContext directly, so this is **not** falsely presented as fully implemented Clean Architecture.
 - API security uses ASP.NET Identity, JWT access/hashed rotating refresh sessions, role guards and **resource ownership**. UI controls are not authority to bypass backend checks.
-- \`DareCare.Api/Services\` currently includes account email and private file-storage implementations; they are **not** independently deployed services.
-- \`DareCare.Infrastructure/Persistence\` contains the DbContext, migration and seeder; it is the single relational model. Provider uses SQL Server for persistent target vs temporary SQLite demo.
+- `DareCare.Api/Services` currently includes account email and private file-storage implementations; they are **not** independently deployed services.
+- `DareCare.Infrastructure/Persistence` contains the DbContext, migration and seeder; it is the single relational model. Provider uses SQL Server for persistent target vs temporary SQLite demo.
 - SMS, Stripe/payment, inventory, third-party courier and AI clinical inference components do **not** exist in the current MVP; none are drawn.
 - Flutter and external web clients are integration deliverables, not proven live applications at the documented commit; DareCare Lite/Admin web assets exist in the API source.
 
 ## Project and assembly dependencies (source-level)
-\`\`\`mermaid
+```mermaid
 flowchart LR
   API["DareCare.Api.csproj"] --> APP["DareCare.Application.csproj"]
   API --> INF["DareCare.Infrastructure.csproj"]
@@ -89,12 +89,12 @@ flowchart LR
   INF --> DOM
   INF --> EF["EF Core / SQL Server / SQLite / Identity packages"]
   API --> JWT["JWT Bearer / OpenAPI / Google.Apis.Auth / Otp.NET"]
-\`\`\`
+```
 
 This is the project-reference/package dependency graph; direct namespaces inside controllers can additionally use Domain types via referenced assemblies. Do not infer that Application hosts the booking logic as a separate service.
 
 ## Integration sequence — core booking (logical)
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
   actor Patient
   participant Client as Flutter / Web client
@@ -113,12 +113,12 @@ sequenceDiagram
   API->>DB: Query only current patient's bookings
   DB-->>API: Owner-filtered rows
   API-->>Client: Current booking states
-\`\`\`
+```
 
-\`Booking.TransitionTo\` controls later state changes; first creation initializes \`Pending\`. The database filtered unique index prevents a second active booking of the same slot. The code's actual HTTP error type depends on the validation and conflict branch.
+`Booking.TransitionTo` controls later state changes; first creation initializes `Pending`. The database filtered unique index prevents a second active booking of the same slot. The code's actual HTTP error type depends on the validation and conflict branch.
 
 ## Integration sequence — fictional prescription and pharmacy
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
   actor Patient
   actor Pharmacy
@@ -143,7 +143,7 @@ sequenceDiagram
   API->>DB: Enforce state sequence + updated version
   DB-->>API: State persisted
   API-->>Pharmacy: Latest status
-\`\`\`
+```
 
 The flow is an **application-managed delivery status**, not third-party real-world medicine dispensing or shipping integration.
 
