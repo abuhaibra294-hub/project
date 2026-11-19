@@ -12,24 +12,24 @@
 | State Diagram | Medium | [05_STATE_DIAGRAMS.md](05_STATE_DIAGRAMS.md) | Booking, pharmacy order and support ticket state machines from exact domain rules |
 
 ## Source and analysis methods
-- GitHub repository: \`abuhaibra294-hub/project\`; current DARECARE work is on \`darecare-demo-free\`, **not** the unrelated default \`main\`.
-- Physical database source: \`src/DareCare.Infrastructure/Persistence/Migrations/20261030184459_InitialSqlServer.cs\` and \`DareCareDbContext.cs\`.
-- Runtime domain rules: \`src/DareCare.Domain/Entities/Booking.cs\`, \`PharmacyOrder.cs\`, \`SupportTicket.cs\`; respective enum files under \`src/DareCare.Domain/\`.
-- Data flows: \`src/DareCare.Api/Controllers/\`, account email and private file services; external integration status is documented conditionally.
-- Project references: \`DareCare.slnx\` and each \`src/DareCare.*/*.csproj\`.
+- GitHub repository: `abuhaibra294-hub/project`; current DARECARE work is on `darecare-demo-free`, **not** the unrelated default `main`.
+- Physical database source: `src/DareCare.Infrastructure/Persistence/Migrations/20261030184459_InitialSqlServer.cs` and `DareCareDbContext.cs`.
+- Runtime domain rules: `src/DareCare.Domain/Entities/Booking.cs`, `PharmacyOrder.cs`, `SupportTicket.cs`; respective enum files under `src/DareCare.Domain/`.
+- Data flows: `src/DareCare.Api/Controllers/`, account email and private file services; external integration status is documented conditionally.
+- Project references: `DareCare.slnx` and each `src/DareCare.*/*.csproj`.
 - Data dictionary reflects **SQL Server migration source** only; the free demo uses disposable SQLite. These are documentation assets, **not** evidence that paid persistent staging exists.
 
 ## Accuracy and editorial policy
-1. The ERDs use the **actual** physical FK graph. \`Bookings.PatientUserId\` references \`AspNetUsers\`; saved address ID is not persisted in \`Bookings\`.
+1. The ERDs use the **actual** physical FK graph. `Bookings.PatientUserId` references `AspNetUsers`; saved address ID is not persisted in `Bookings`.
 2. Schema is derived from **25 SQL Server tables, 35 foreign keys, 43 indexes and 170 columns** in the migration.
 3. DFD cylinders are **logical groups of stores**, not separate microservice databases.
 4. Application contains **DTO contracts**; controllers still own orchestration in places. The Component Diagram never falsely claims full use-case Clean Architecture.
-5. State machine edges are restricted to explicit Domain methods; \`IsApproved\` provider booleans are **not** their own enumerated workflow.
+5. State machine edges are restricted to explicit Domain methods; `IsApproved` provider booleans are **not** their own enumerated workflow.
 6. Prescription **file bytes** live in non-public storage outside SQL Server and should only contain fictional data for this demo.
 7. No real clinical diagnosis, payments, pharmacy inventory, courier provider or medical claim was added to the drawings.
 
 ## Notion submission
-See [06_NOTION_HANDOFF_AR.md](06_NOTION_HANDOFF_AR.md) for **ready-to-paste Arabic Description and Acceptance Criteria** for each of Abdel Maqsoud's five rows, plus GitHub links and review status. The Notion team-page link was **not accessible** through the connected integration, so **no existing task statuses were modified**. The screenshot shows all five as \`To Do\`.
+See [06_NOTION_HANDOFF_AR.md](06_NOTION_HANDOFF_AR.md) for **ready-to-paste Arabic Description and Acceptance Criteria** for each of Abdel Maqsoud's five rows, plus GitHub links and review status. The Notion team-page link was **not accessible** through the connected integration, so **no existing task statuses were modified**. The screenshot shows all five as `To Do`.
 
 ## Acceptance and sign-off
 - [x] All five technical topics documented using source material.
