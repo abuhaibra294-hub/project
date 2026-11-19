@@ -76,3 +76,20 @@ No real delivery integration exists; "Delivered" is a workflow status, not couri
 - ADR-003: DTO-first OpenAPI + role/ownership matrix as integration contract; version breaking changes.
 - ADR-004: Secure private object storage and scanning for prescriptions before non-synthetic use.
 - ADR-005: CI, automated role-based API E2E and deployed revision indicator gate release.
+
+## Editable logical component diagram (as-is architecture)
+
+```mermaid
+flowchart TB
+  CL[Flutter / Web clients] -->|HTTPS REST /api/v1| API[DareCare.Api Controllers]
+  API --> AUTH[Identity / JWT / Rate limiting / Role checks]
+  API --> APP[DareCare.Application DTO contracts]
+  API --> DOM[DareCare.Domain entities & state rules]
+  API --> INF[DareCare.Infrastructure EF / Identity persistence]
+  INF --> SQL[(SQL Server target)]
+  INF -.-> DEV[(SQLite disposable demo)]
+  API --> PRIV[(Private prescription storage)]
+  API --> MAIL[SMTP notification adapter]
+```
+
+**Fidelity note:** Application currently contains contracts, while some orchestration is still in controllers. Diagram is a logical dependency view, not proof that every business operation has been moved into Application services. Concrete deployments are shown separately in [Deployment Diagrams](10_DEPLOYMENT_DIAGRAM.md) and the staged rollout in [Deployment Strategy](09_DEPLOYMENT_STRATEGY.md).
