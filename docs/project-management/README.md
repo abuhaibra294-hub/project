@@ -36,3 +36,7 @@ The screenshot lists 10 **To Do** tasks assigned to Mahmoud Gamal. The linked No
 12. [Mahmoud's Notion Task Traceability](12_MAHMOUD_TASK_TRACEABILITY.md) — 10-task-to-document map, priority and remaining reviewer/engineering acceptance gates.
 
 **Review workflow:** inspect these files, approve requirements/dates/metrics with the team, test deployment/integration on a known revision and then update Notion task statuses when access is available. The Readme/earlier package captures code baseline `94ebc1e...` for PR #11; PR #21 merged the original documentation only, and this extension does not claim newer runtime deployment.
+
+## Related System Analysis Deliverables — Abdel Maqsoud
+
+The five Notion analysis items (ER Diagram, Logical & Physical Schema, DFD, Component Diagram, State Diagram) are documented in **[Abdel Maqsoud's system-analysis package](../system-analysis/README.md)**. It includes editable Mermaid diagrams, a SQL Server migration-derived physical data dictionary and [ready-to-paste Notion descriptions/acceptance criteria](../system-analysis/06_NOTION_HANDOFF_AR.md). This package is **documentation ready for review**, not proof of live database migration, production deployment or Notion task acceptance.
