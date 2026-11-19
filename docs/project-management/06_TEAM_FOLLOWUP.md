@@ -70,3 +70,9 @@ Risk likelihood is **planning judgment**, not measured incident frequency.
 - [ ] HTTPS, approved origins, secret storage and logging safeguards reviewed
 - [ ] All P0 GitHub issues closed with evidence, all blocking bugs fixed or explicitly accepted
 - [ ] Demo script rehearsed, fallback prepared and final signoff recorded
+
+## Explicit Notion-to-GitHub progress mapping for Mahmoud Gamal
+
+The screenshot of **DarCare Team Tasks** shows all 10 Mahmoud Gamal tasks as `To Do`. Documentation coverage and formal task completion are **not** the same thing. Use [12_MAHMOUD_TASK_TRACEABILITY.md](12_MAHMOUD_TASK_TRACEABILITY.md) for each title, priority, exact deliverable link and reviewer/execution gate. Existing Notion records were not modified: the linked source page was not accessible to the current Notion integration at review time.
+
+For a weekly review, separately track: **prepared**, **reviewed/accepted**, **implemented**, **CI-tested**, **deployed**, and **verified on the target environment**. Close only genuinely satisfied task criteria with evidence. Additional task references: [07 Technology Stack](07_TECHNOLOGY_STACK.md), [08 API routes](08_API_ROUTE_INVENTORY.md), [09 Deployment Strategy](09_DEPLOYMENT_STRATEGY.md), [10 Deployment Diagram](10_DEPLOYMENT_DIAGRAM.md), [11 KPIs](11_KPIS_AND_MEASUREMENT.md).

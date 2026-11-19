@@ -93,3 +93,11 @@ Content-Type: application/json
 - [ ] Refresh Postman collection/client examples from approved contract.
 - [ ] Record auth-required flag, example payload, response schema, errors, ownership, pagination for each client-used operation.
 - [ ] Add contract test in CI that fails on undocumented breaking changes.
+
+## Appendix — complete source route list and client contract clarification
+
+For every source operation (all **100**, grouped into 17 families), see [08_API_ROUTE_INVENTORY.md](08_API_ROUTE_INVENTORY.md). The source manifest's Pharmacy role label on `GET /api/v1/pharmacies/available` conflicts with the actual controller's `[AllowAnonymous]` annotation; the route inventory highlights that exception rather than silently trusting the manifest.
+
+**Booking address:** The actual `CreateBookingRequest` DTO allows either a saved `addressId` or a free-text `serviceAddress`, but explicitly disallows sending both. An example using `addressId` alone is one valid option, not the complete contract.
+
+**Release dependency:** Source inventory does not establish deployed availability; issue #12 must validate the selected environment's live OpenAPI and authentication semantics. Detailed execution gates are in [Integration Playbook](05_INTEGRATION_PLAYBOOK.md) and [Deployment Strategy](09_DEPLOYMENT_STRATEGY.md).
