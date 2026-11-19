@@ -2,12 +2,12 @@
 **Owner:** Abdel Maqsoud | **Notion task:** DFD | **Priority:** Medium | **Version:** source analysis, 19 November 2026.
 
 ## Scope and notation
-DFDs describe **business data moving between external actors, processes and logical stores**. They are *not* deployment/network diagrams, sequence diagrams or UML class diagrams. Solid arrows show data exchanges; cylinders denote logical data stores. Source basis is the existing \`src/DareCare.Api/Controllers\`, application DTOs and \`DareCareDbContext\`.
+DFDs describe **business data moving between external actors, processes and logical stores**. They are *not* deployment/network diagrams, sequence diagrams or UML class diagrams. Solid arrows show data exchanges; cylinders denote logical data stores. Source basis is the existing `src/DareCare.Api/Controllers`, application DTOs and `DareCareDbContext`.
 
 The project actors are **Patient, Nurse, Pharmacy, Admin**. SMTP and Google ID-token verification appear only as **configuration-dependent external services**; they are not guaranteed to be live on the current free demo. All sample prescription documents and accounts are fictional.
 
 ## DFD Level 0 — Context diagram
-\`\`\`mermaid
+```mermaid
 flowchart LR
   PAT["Patient"] -->|Credentials, service/booking requests, synthetic prescription, quote decision| SYS(("0 - DareCare System"))
   SYS -->|Profile, available nurses/slots, booking/quote/order statuses, notifications| PAT
@@ -20,12 +20,12 @@ flowchart LR
   SYS -.->|OTP and invitation email when configured| SMTP["SMTP provider"]
   PAT -.->|Patient Google ID token| SYS
   SYS -.->|Validate configured Google sign-in token| GOOGLE["Google identity trust service"]
-\`\`\`
+```
 
 **Balance:** The context's account, provider, booking, pharmacy and support exchanges are decomposed into Level 1 processes below. SMTP and Google are external trust/delivery services, not DFD stores or roles.
 
 ## DFD Level 1 — Main processes and stores
-\`\`\`mermaid
+```mermaid
 flowchart TB
   PAT["E1 Patient"]
   NUR["E2 Nurse"]
@@ -88,12 +88,12 @@ flowchart TB
   P6 <-->|Support and audit| D6
   ADM -->|Dashboard/audit query| P6
   P6 -->|Role-protected overview/audit| ADM
-\`\`\`
+```
 
 **Boundaries:** D1–D4 and D6–D7 are *logical data-store groups*, not seven separate physical databases; the current relational data uses a shared EF Core context, and prescription binaries use a **private filesystem outside** public web files. A provider approval updates source tables; this DFD does not imply a new approvals table.
 
 ## DFD Level 2 — Process 3.0 Care booking
-\`\`\`mermaid
+```mermaid
 flowchart TB
   PAT["Patient"]
   NUR["Approved Nurse"]
@@ -124,12 +124,12 @@ flowchart TB
   C34 -->|State-changed event| C35
   C35 -->|Recipient notification| NOTIF
   C35 -->|Auditable transition entry where implemented| AUDIT
-\`\`\`
+```
 
-**Business controls:** One active/history-preserving booking per availability slot is enforced using filtered unique index and application concurrency controls; transitions follow \`Booking.TransitionTo\`. The user may submit a saved \`addressId\` **or** free-text \`serviceAddress\`, but the persisted Booking only retains the **ServiceAddress snapshot**. This flow does not include an online payment gateway.
+**Business controls:** One active/history-preserving booking per availability slot is enforced using filtered unique index and application concurrency controls; transitions follow `Booking.TransitionTo`. The user may submit a saved `addressId` **or** free-text `serviceAddress`, but the persisted Booking only retains the **ServiceAddress snapshot**. This flow does not include an online payment gateway.
 
 ## DFD Level 2 — Process 4.0 Prescription and pharmacy order
-\`\`\`mermaid
+```mermaid
 flowchart TB
   PAT["Patient"]
   PHA["Approved assigned pharmacy"]
@@ -167,20 +167,20 @@ flowchart TB
   Q45 -->|State event| Q46
   Q46 -->|Recipient alert| N
   Q46 -->|Auditable event| A
-\`\`\`
+```
 
-**Business controls:** At most one PharmacyOrder per Prescription; only the assigned pharmacy may quote/update and only the owning patient may accept/decline. \`Delivered\` is an internal status, **not** an actual courier integration; no live stock, medication substitution or payment processing is represented.
+**Business controls:** At most one PharmacyOrder per Prescription; only the assigned pharmacy may quote/update and only the owning patient may accept/decline. `Delivered` is an internal status, **not** an actual courier integration; no live stock, medication substitution or payment processing is represented.
 
 ## Process-to-code traceability
 
 | Process | Primary source/API surface | Main stores |
 | --- | --- | --- |
-| 1.0 Identity & profiles | \`AuthController\`, \`AuthenticatorController\`, \`PatientsController\`, Identity infrastructure | \`AspNetUsers\`, Identity tables, \`RefreshSessions\`, \`Patients\`, \`PatientAddresses\` |
-| 2.0 Provider discovery | \`NursesController\`, \`MatchingController\`, \`ServicesController\`, \`AdminController\` | \`Nurses\`, \`Skills\`, \`NurseSkills\`, \`CareServices\`, \`AvailabilitySlots\`, \`Pharmacies\` |
-| 3.0 Booking | \`BookingsController\`, \`ReviewsController\` | \`Bookings\`, \`NurseReviews\`, \`PatientAddresses\` |
-| 4.0 Prescription & order | \`PrescriptionsController\`, \`PharmacyOrdersController\`, \`PrivatePrescriptionStorage\` | \`Prescriptions\`, \`PharmacyOrders\`, private file storage |
-| 5.0 Support & alerts | \`SupportController\`, \`NotificationsController\` | \`SupportTickets\`, \`SupportMessages\`, \`Notifications\`, \`AuditEvents\` |
-| 6.0 Operations | \`DashboardController\`, \`AdminController\` | aggregates from existing tables |
+| 1.0 Identity & profiles | `AuthController`, `AuthenticatorController`, `PatientsController`, Identity infrastructure | `AspNetUsers`, Identity tables, `RefreshSessions`, `Patients`, `PatientAddresses` |
+| 2.0 Provider discovery | `NursesController`, `MatchingController`, `ServicesController`, `AdminController` | `Nurses`, `Skills`, `NurseSkills`, `CareServices`, `AvailabilitySlots`, `Pharmacies` |
+| 3.0 Booking | `BookingsController`, `ReviewsController` | `Bookings`, `NurseReviews`, `PatientAddresses` |
+| 4.0 Prescription & order | `PrescriptionsController`, `PharmacyOrdersController`, `PrivatePrescriptionStorage` | `Prescriptions`, `PharmacyOrders`, private file storage |
+| 5.0 Support & alerts | `SupportController`, `NotificationsController` | `SupportTickets`, `SupportMessages`, `Notifications`, `AuditEvents` |
+| 6.0 Operations | `DashboardController`, `AdminController` | aggregates from existing tables |
 
 ## Review checklist
 - [x] Context diagram and Level 1 decomposition include all four user roles.
